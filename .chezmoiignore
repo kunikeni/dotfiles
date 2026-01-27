@@ -1,0 +1,22 @@
+# --- Common ignore always ---
+packages/**
+README.md
+cspell.json
+
+# --- Windows ---
+{{ if eq .chezmoi.os "windows" }}
+.bashrc
+.zshrc
+.zprofile
+Library/**
+
+# --- macOS ---
+{{ else if eq .chezmoi.os "darwin" }}
+AppData/**
+
+# --- Linux ---
+{{ else if eq .chezmoi.os "linux" }}
+Library/**
+AppData/**
+
+{{ end }}

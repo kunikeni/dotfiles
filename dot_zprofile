@@ -1,0 +1,8 @@
+# Homebrewのパスを優先
+export PATH=/opt/homebrew/bin/:$PATH
+
+# Homebrew関連の補完と補助ツールを設定
+if [ -x "$(command -v brew)" ]; then
+    fpath=($(brew --prefix)/share/zsh-completions $fpath)
+    source /opt/homebrew/share/zsh-autosuggestions/zsh-autosuggestions.zsh
+fi

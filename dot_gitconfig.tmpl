@@ -1,0 +1,37 @@
+[user]
+	name  = {{ .gitName }}
+	email = {{ .userEmail }}
+[alias]
+	c = commit -m
+	st = status
+	ad = add
+	p = pull
+	res = reset --soft HEAD^
+	conf = config --global
+	ad = add .
+	prune = fetch --prune
+	pm = pull origin master
+	sw = switch
+[init]
+	defaultBranch = main
+[core]
+	autocrlf = input
+	ignorecase = false
+
+{{ if eq .chezmoi.os "darwin" }}
+# macOSの場合
+[credential "https://github.com"]
+	helper =
+	helper = !/opt/homebrew/bin/gh auth git-credential
+[credential "https://gist.github.com"]
+	helper =
+	helper = !/opt/homebrew/bin/gh auth git-credential
+{{ else if eq .chezmoi.os "linux" }}
+# Linuxの場合
+[credential "https://github.com"]
+	helper =
+	helper = !/usr/bin/gh auth git-credential
+[credential "https://gist.github.com"]
+	helper =
+	helper = !/usr/bin/gh auth git-credential
+{{ end }}

@@ -1,0 +1,178 @@
+{
+  "[css]": {
+    "editor.tabSize": 2
+  },
+  "[dockercompose]": {
+    "editor.autoIndent": "advanced",
+    "editor.defaultFormatter": "redhat.vscode-yaml",
+    "editor.insertSpaces": true,
+    "editor.tabSize": 2
+  },
+  "[github-actions-workflow]": {
+    "editor.defaultFormatter": "redhat.vscode-yaml"
+  },
+  "[html]": {
+    "editor.defaultFormatter": "vscode.html-language-features",
+    "editor.tabSize": 2
+  },
+  "[javascript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.tabSize": 2
+  },
+  "[javascriptreact]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.tabSize": 2
+  },
+  "[json]": {
+    "editor.defaultFormatter": "vscode.json-language-features",
+    "editor.tabSize": 2
+  },
+  "[jsonc]": {
+    "editor.defaultFormatter": "vscode.json-language-features"
+  },
+  "[markdown]": {
+    "editor.defaultFormatter": "DavidAnson.vscode-markdownlint",
+    "editor.tabSize": 2
+  },
+  "[prompt]": {
+    "diffEditor.ignoreTrimWhitespace": false,
+    "editor.quickSuggestions": {
+      "comments": "off",
+      "other": "off",
+      "strings": "off"
+    },
+    "editor.unicodeHighlight.ambiguousCharacters": false,
+    "editor.unicodeHighlight.invisibleCharacters": false,
+    "editor.wordWrap": "on"
+  },
+  "[python]": {
+    "diffEditor.ignoreTrimWhitespace": false,
+    "editor.codeActionsOnSave": {
+      "source.organizeImports": "explicit"
+    },
+    "editor.defaultFormatter": "charliermarsh.ruff",
+    "editor.formatOnSave": true,
+    "editor.formatOnType": true,
+    "editor.wordBasedSuggestions": "off"
+  },
+  "[scss]": {
+    "editor.tabSize": 2
+  },
+  "[terraform-vars]": {
+    "editor.defaultFormatter": "hashicorp.terraform",
+    "editor.formatOnSaveMode": "file"
+  },
+  "[terraform]": {
+    "editor.defaultFormatter": "hashicorp.terraform",
+    "editor.formatOnSaveMode": "file"
+  },
+  "[typescript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[typescriptreact]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "chat.tools.terminal.autoApprove": {
+    "awk": false,
+    "cat": false,
+    "find": false,
+    "grep": false,
+    "head": false,
+    "less": false,
+    "python -c": false,
+    "python -m": false,
+    "python3 -c": false,
+    "python3 -m": false,
+    "realpath": false,
+    "sed": false,
+    "tail": false,
+    "uv run make": true,
+    "uv run pytest": true,
+    "uv run task": true
+  },
+  "chat.viewSessions.orientation": "stacked",
+  "claudeCode.disableLoginPrompt": true,
+  "claudeCode.environmentVariables": [],
+  "claudeCode.initialPermissionMode": "acceptEdits",
+  "claudeCode.preferredLocation": "panel",
+  "claudeCode.selectedModel": "haiku",
+  "claudeCode.useCtrlEnterToSend": true,
+  "css.format.spaceAroundSelectorSeparator": true,
+  "diffEditor.ignoreTrimWhitespace": false,
+  "editor.accessibilitySupport": "off",
+  "editor.autoClosingBrackets": "always",
+  "editor.autoClosingQuotes": "always",
+  "editor.bracketPairColorization.independentColorPoolPerBracketType": true,
+  "editor.codeLens": false,
+  "editor.defaultFormatter": "charliermarsh.ruff",
+  "editor.fontFamily": "Menlo, Monaco, 'Courier New', monospace, \"Hack Nerd Font\"",
+  "editor.formatOnSave": true,
+  "editor.linkedEditing": true,
+  "editor.parameterHints.enabled": false,
+  "editor.quickSuggestions": {
+    "comments": "inline",
+    "strings": "inline"
+  },
+  "editor.unicodeHighlight.invisibleCharacters": false,
+  "editor.wordSeparators": "`~!@#$%^&*()=+[{]}\\|;:'\",.<>/?、。（）",
+  "errorLens.messageEnabled": false,
+  "explorer.confirmDelete": false,
+  "explorer.confirmDragAndDrop": false,
+  "files.associations": {
+    "*.pdf": "latex"
+  },
+  "files.autoSave": "afterDelay",
+  "files.eol": "\n",
+  "files.trimTrailingWhitespace": true,
+  "git.confirmSync": false,
+  "git.enableSmartCommit": true,
+  "git.ignoreRebaseWarning": true,
+  "git.openRepositoryInParentFolders": "never",
+  "github.copilot.advanced": {},
+  "github.copilot.chat.codeGeneration.useInstructionFiles": false,
+  "github.copilot.nextEditSuggestions.enabled": true,
+  "javascript.updateImportsOnFileMove.enabled": "always",
+  "jupyter.askForKernelRestart": false,
+  "makefile.configureOnOpen": true,
+  "notebook.formatOnSave.enabled": true,
+  "notebook.lineNumbers": "on",
+  "path-intellisense.showHiddenFiles": true,
+  "python.analysis.autoFormatStrings": true,
+  "python.analysis.diagnosticSeverityOverrides": {
+    "reportArgumentType": "none",
+    "reportGeneralTypeIssues": "none",
+    "reportUnknownMemberType": "none",
+    "reportUnknownVariableType": "none"
+  },
+  "python.analysis.extraPaths": [],
+  "python.analysis.typeCheckingMode": "standard",
+  "python.autoComplete.extraPaths": [],
+  "python.languageServer": "Pylance",
+  "python.testing.pytestEnabled": true,
+  "remote.extensionKind": {
+    "GitHub.copilot": [
+      "ui"
+    ],
+    "GitHub.copilot-chat": [
+      "ui"
+    ]
+  },
+  "ruff.organizeImports": true,
+  "security.workspace.trust.untrustedFiles": "open",
+  "terminal.integrated.defaultProfile.windows": "PowerShell",
+  "terminal.integrated.enableMultiLinePasteWarning": false,
+  "terminal.integrated.fontFamily": "\"Hack Nerd Font\"",
+  "terminal.integrated.inheritEnv": true,
+  "terminal.integrated.scrollback": 10000,
+  "terminal.integrated.suggest.enabled": true,
+  "typescript.updateImportsOnFileMove.enabled": "always",
+  "update.showReleaseNotes": false,
+  "window.confirmSaveUntitledWorkspace": false,
+  "workbench.colorTheme": "Default Dark+",
+  "workbench.editorAssociations": {
+    "*.obj": "default",
+    "*.pdf": "default"
+  },
+  "workbench.iconTheme": "material-icon-theme",
+  "workbench.startupEditor": "none"
+}

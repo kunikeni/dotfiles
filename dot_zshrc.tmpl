@@ -1,0 +1,92 @@
+## git
+source ~/.zsh/git-prompt.sh
+GIT_PS1_SHOWDIRTYSTATE=true
+GIT_PS1_SHOWUNTRACKEDFILES=true
+GIT_PS1_SHOWSTASHSTATE=true
+GIT_PS1_SHOWUPSTREAM=auto
+
+## functions
+function y() {
+	local tmp="$(mktemp -t "yazi-cwd.XXXXXX")" cwd
+	yazi "$@" --cwd-file="$tmp"
+	if cwd="$(command cat -- "$tmp")" && [ -n "$cwd" ] && [ "$cwd" != "$PWD" ]; then
+		builtin cd -- "$cwd"
+	fi
+	rm -f -- "$tmp"
+}
+
+on_demand_completion() {
+  local cmd_name=$1
+  local completion_command=$2
+  local function_name="_${cmd_name}"
+  local comp_cmd_name="${completion_command%% *}"
+
+  eval "function $function_name() {
+    if ! command -v "$comp_cmd_name" &> /dev/null; then
+      return
+    fi
+    unfunction '$function_name'
+    eval \"\$(eval $completion_command)\"
+    \$_comps[$cmd_name]
+  }"
+
+  compdef $function_name $cmd_name
+}
+
+cdf() {
+  local sel
+  sel=$(fd) || return
+
+  if [ -d "$sel" ]; then
+    cd "$sel"
+  elif [ -f "$sel" ]; then
+    cd "$(dirname "$sel")"
+  fi
+}
+
+## export
+export HOMEBREW_GITHUB_API_TOKEN={{ .HOMEBREW_GITHUB_API_TOKEN | quote }}
+export GCAL_NIPPO_PATH="$HOME/Documents/app/gcal-nippo"
+export PATH="$HOME/.local/bin:$PATH"
+export PATH="/opt/homebrew/bin:$PATH"
+### MANAGED BY RANCHER DESKTOP START (DO NOT EDIT)
+export PATH="/Users/{{ .userName }}/.rd/bin:$PATH"
+### MANAGED BY RANCHER DESKTOP END (DO NOT EDIT)
+
+## alias
+alias aws_sso='aws sso login --sso-session'
+alias cl="clear"
+alias daily_nippo="docker run -it --rm -v $GCAL_NIPPO_PATH/log:/app/log gcal-nippo daily_nippo"
+alias digdag='docker run -it --rm -v /Users/{{ .userName }}/Documents/work/isis/ccmp_support_sys_mail:/src --mount source=digdag,target=/root/.config digdag-local'
+alias g='git'
+alias ls='eza --icons'
+alias ll='eza --icons -al --group-directories-first'
+alias tree='eza --icons -al -T -L 2'
+alias vim='nvim'
+alias vibe='PORT=3000 npx vibe-kanban'
+alias ctop='DOCKER_HOST=unix:///Users/{{ .userName }}/.rd/docker.sock ctop'
+alias ctops='DOCKER_HOST=unix:///Users/{{ .userName }}/.rd/docker.sock ctop -s mem'
+alias fd='fd -H | fzf --height 30% --border'
+
+## completion
+# 初期化
+autoload bashcompinit && bashcompinit
+autoload -Uz compinit
+compinit
+
+# AWS CLI
+complete -C '/opt/homebrew/bin/aws_completer' aws
+
+# mise
+eval "$(mise activate zsh)"
+eval "$(mise completion zsh)"
+
+# uv
+on_demand_completion 'uv' 'uv generate-shell-completion zsh'
+
+# GitHub CLI
+eval "$(gh completion -s zsh)"
+
+# UI
+eval "$(starship init zsh)"
+eval "$(zoxide init zsh --cmd cd)"

@@ -1,0 +1,15 @@
+bat
+btop
+eza
+fd-find
+fzf
+gh
+git
+grafana
+jq
+mise
+ripgrep
+tailscale
+vim
+zsh
+zoxide

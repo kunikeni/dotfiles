@@ -1,0 +1,45 @@
+{
+    "permissions": {
+        "allow": [
+            "Bash(uv run pytest:*)",
+            "Bash(uv run task lint)",
+            "Bash(uv run task format)",
+            "Bash(uv run task type-check)",
+            "Bash(uv run task test)",
+            "Read(~/.zshrc)"
+        ],
+        "deny": [
+            "Bash(curl:*)",
+            "Bash(git checkout:*)",
+            "Bash(sudo rm:*)",
+            "Bash(rmdir:*)",
+            "Bash(rm -rf:*)",
+            "Bash(rm -r:*)",
+            "Bash(rm --recursive:*)",
+            "Bash(rm --force:*)",
+            "Bash(rm -f:*)",
+            "Bash(rm -R:*)",
+            "Bash(xargs rm:*)",
+            "Bash(sudo:*)",
+            "Bash(chmod 777:*)",
+            "Bash(gh pr view:*)",
+            "Bash(gh pr diff:*)",
+            "Bash(python -m:*)",
+            "Bash(uv run black:*)",
+            "Bash(uvx:*)",
+            "Read(.env*)",
+            "Read(id_rsa*)",
+            "Read(*.key)",
+            "Read(*.pem)"
+        ]
+    },
+    "env": {
+        "CLAUDE_CODE_USE_BEDROCK": "1",
+        "AWS_PROFILE": "nif-ai",
+        "AWS_REGION": "us-east-1",
+        "CLAUDE_CODE_MAX_OUTPUT_TOKENS": "4096",
+        "ANTHROPIC_MODEL": "us.anthropic.claude-haiku-4-5-20251001-v1:0",
+        "ANTHROPIC_SMALL_FAST_MODEL": "us.anthropic.claude-3-7-sonnet-20250219-v1:0",
+        "MAX_THINKING_TOKENS": "1024"
+    }
+}
