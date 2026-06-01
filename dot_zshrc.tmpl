@@ -48,6 +48,8 @@ cdf() {
 export HOMEBREW_GITHUB_API_TOKEN={{ .HOMEBREW_GITHUB_API_TOKEN | quote }}
 export PATH="$HOME/.local/bin:$PATH"
 export PATH="/opt/homebrew/bin:$PATH"
+export PATH="$HOME/.local/share/mise/shims:$PATH"
+export ZED_AWS_PROFILE='nif-ai'
 ### MANAGED BY RANCHER DESKTOP START (DO NOT EDIT)
 export PATH="/Users/{{ .userName }}/.rd/bin:$PATH"
 ### MANAGED BY RANCHER DESKTOP END (DO NOT EDIT)

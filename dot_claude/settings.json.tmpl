@@ -1,0 +1,76 @@
+{
+  "env": {
+    "CLAUDE_CODE_USE_BEDROCK": "1",
+    "AWS_PROFILE": {{ .claude_aws_profile | quote }},
+    "AWS_REGION": "us-east-1",
+    "ANTHROPIC_MODEL": {{ .claude_model | quote }},
+    "ANTHROPIC_SMALL_FAST_MODEL": "us.anthropic.claude-haiku-4-5-20251001-v1:0",
+    "CLAUDE_CODE_MAX_OUTPUT_TOKENS": "500000",
+    "MAX_THINKING_TOKENS": "10240"
+  },
+  "permissions": {
+    "allow": [
+      "Bash(uv run pytest:*)",
+      "Bash(uv run task lint)",
+      "Bash(uv run task format)",
+      "Bash(uv run task type-check)",
+      "Bash(uv run task test)",
+      "Bash(uv run make lint)",
+      "Bash(uv run make format)",
+      "Bash(uv run make type-check)",
+      "Bash(uv run make test)",
+      "Bash(terraform plan)",
+      "Bash(terraform validate)",
+      "Bash(gh pr view:*)",
+      "Bash(gh pr diff:*)",
+      "Read(.env.template)",
+      "Read(~/.zshrc)"
+    ],
+    "deny": [
+      "Bash(git checkout:*)",
+      "Bash(git push)",
+      "Bash(git push -f)",
+      "Bash(git stash)",
+      "Bash(git rebase:*)",
+      "Bash(git reset:*)",
+      "Bash(sudo rm:*)",
+      "Bash(rmdir:*)",
+      "Bash(rm -rf:*)",
+      "Bash(rm -r:*)",
+      "Bash(rm --recursive:*)",
+      "Bash(rm --force:*)",
+      "Bash(rm -f:*)",
+      "Bash(rm -R:*)",
+      "Bash(xargs rm:*)",
+      "Bash(sudo:*)",
+      "Bash(chmod 777:*)",
+      "Bash(python -m:*)",
+      "Bash(python3 -m:*)",
+      "Bash(python -c:*)",
+      "Bash(python3 -c:*)",
+      "Bash(uv run black:*)",
+      "Bash(uv run python -m:*)",
+      "Bash(uv run ruff check:*)",
+      "Bash(uv run ruff format:*)",
+      "Bash(uvx:*)",
+      "Bash(terraform destroy)",
+      "Read(.env)",
+      "Read(.env.local)",
+      "Read(id_rsa*)",
+      "Read(*.key)",
+      "Read(*.pem)"
+    ],
+    "defaultMode": "default"
+  },
+  "model": "us.anthropic.claude-opus-4-8",
+  "statusLine": {
+    "type": "command",
+    "command": "input=$(cat); cwd=$(pwd); user=$(whoami); host=$(hostname -s); git_info=\"\"; [ -d .git ] && git_branch=$(git branch --show-current 2>/dev/null) && [ -n \"$git_branch\" ] && git_info=\" ($git_branch)\"; model_id=$(echo \"$input\" | jq -r '.model.id // empty'); model_info=\"\"; if [ -n \"$model_id\" ]; then case \"$model_id\" in *haiku*) model_short=\"haiku\";; *sonnet*) model_short=\"sonnet\";; *opus*) model_short=\"opus\";; *) model_short=$(echo \"$model_id\" | grep -oE '(haiku|sonnet|opus)' | head -n1);; esac; [ -n \"$model_short\" ] && model_info=\" [$model_short]\"; fi; total_in=$(echo \"$input\" | jq -r '.context_window.total_input_tokens // 0'); total_out=$(echo \"$input\" | jq -r '.context_window.total_output_tokens // 0'); context_size=$(echo \"$input\" | jq -r '.context_window.context_window_size // 0'); used_pct=$(echo \"$input\" | jq -r '.context_window.used_percentage // 0'); context_info=\"\"; if [ \"$context_size\" -gt 0 ]; then in_k=$((total_in / 1000)); out_k=$((total_out / 1000)); size_k=$((context_size / 1000)); context_info=$(printf \" [in:%dk out:%dk / %dk, %d%%]\" \"$in_k\" \"$out_k\" \"$size_k\" \"$used_pct\"); fi; printf \"\\033[01;32m%s@%s\\033[00m:\\033[01;34m%s\\033[00m%s\\033[35m%s\\033[00m\\033[33m%s\\033[00m\" \"$user\" \"$host\" \"$cwd\" \"$git_info\" \"$model_info\" \"$context_info\""
+  },
+  "enabledPlugins": {
+    "slack@claude-plugins-official": true,
+    "notion@claude-plugins-official": true,
+    "code-review@claude-plugins-official": true
+  },
+  "language": "Japanese"
+}
