@@ -579,4 +579,59 @@ export async function GET(request: Request) {
 }
 ```
 
-**Remember**: Backend patterns enable scalable, maintainable server-side applications. Choose patterns that fit your complexity level.
+## Clean Architecture (4層)
+
+API層 → Usecase層 → Domain層 ← Infrastructure層
+
+| 層 | 責務 | 主要コンポーネント |
+|----|------|-------------------|
+| API | HTTP処理、リクエスト/レスポンス変換 | Router, Serializer |
+| Usecase | ビジネスロジック調整、フロー管理 | UseCase, Injector |
+| Domain | ビジネスロジック、契約定義 | Entity, Interface, Service, Serializer |
+| Infrastructure | 技術実装（外部API、DB） | Provider, Repository |
+
+### 依存関係
+
+- **許可:** API→Usecase, Usecase→Domain+Infrastructure, Infrastructure→Domain Interface
+- **禁止:** Domain→API, Domain→Infrastructure（直接）, Infrastructure→Usecase
+
+### Provider vs Repository
+
+| 項目 | Provider | Repository |
+|------|----------|------------|
+| 対象 | 外部 API | データベース |
+| セッション | 不要 | 必要（injector から受領） |
+| Injector切替 | `ENVIRONMENT` + モックフラグ | `ENVIRONMENT` + `session is None` |
+
+### Injector パターン
+
+```python
+def product_repository_injector(session: AsyncSession | None) -> ProductRepositoryInterface:
+    if ENVIRONMENT == "test" or session is None:
+        return ProductRepositoryMock()
+    return ProductRepositoryImpl(session)
+```
+
+### エラーハンドリング（層別）
+
+| 層 | エラークラス | 例 |
+|----|------------|-----|
+| Domain | `DomainError` | `DomainError(code="INVALID_STATE", message="...")` |
+| Usecase | `ApplicationError` | `ApplicationError(kind=ResourceKind.X, message="...")` |
+| API | `HTTPException` | `HTTPException(status_code=400, detail="...")` |
+
+### 新機能実装順序
+
+1. **Domain層** → Entity, Interface, Business Logic
+2. **Usecase層** → ハンドラー, Service連携
+3. **Infrastructure層** → Provider/Repository実装
+4. **API層** → Router, Serializer
+
+### テスト戦略（層別）
+
+| 層 | テスト種別 | モック対象 |
+|----|----------|-----------|
+| Domain | ユニットテスト | Repository/Provider |
+| Usecase | 統合テスト | Repository/Provider |
+| Infrastructure | 統合テスト | なし（実DB/API） |
+| API | E2Eテスト | なし |

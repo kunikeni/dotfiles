@@ -395,6 +395,40 @@ npm test && npm run lint
 9. **Clean Up After Tests** - No side effects
 10. **Review Coverage Reports** - Identify gaps
 
+## Prohibited
+
+- unittest
+- unittest.mock
+- pytest.skip（明示的なユーザー承認と理由記載がある場合のみ例外）
+
+## Execution Rules
+
+DoD 検証では必ずタスクランナー経由で実行。
+
+```bash
+# 正しい: タスクランナー経由
+uv run task test
+uv run task lint
+uv run task format
+uv run task type-check
+
+# 開発中の個別テスト: 許可
+uv run pytest tests/test_user.py::test_create -v
+
+# 禁止: ツールの直接実行
+uv run ruff check .      # NG
+uv run mypy .            # NG
+```
+
+## Coverage Requirements
+
+- Minimum 80% coverage required
+- High-risk code requires 100% coverage:
+  - Authentication/Authorization
+  - Financial operations
+  - Data validation
+  - Security-critical paths
+
 ## Success Metrics
 
 - 80%+ code coverage achieved
@@ -403,7 +437,3 @@ npm test && npm run lint
 - Fast test execution (< 30s for unit tests)
 - E2E tests cover critical user flows
 - Tests catch bugs before production
-
----
-
-**Remember**: Tests are not optional. They are the safety net that enables confident refactoring, rapid development, and production reliability.

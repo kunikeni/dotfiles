@@ -580,7 +580,7 @@ class Repository(ABC):
 src/
 ├── api/                    # ルータ層（HTTP）
 │   ├── __init__.py
-│   ├── depen/Users/sci02236/Documents/work/isis-transaction-mail/src/transaction_maildencies.py     # 依存注入
+│   ├── depen/Users/user/Documents/work/src/transaction_maildencies.py     # 依存注入
 │   └── v1/
 │       ├── markets.py      # マーケットエンドポイント
 │       ├── users.py        # ユーザーエンドポイント

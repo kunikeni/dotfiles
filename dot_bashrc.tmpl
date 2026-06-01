@@ -167,7 +167,6 @@ cdf() {
 
 ## export
 export HOMEBREW_GITHUB_API_TOKEN={{ .HOMEBREW_GITHUB_API_TOKEN | quote }}
-export GCAL_NIPPO_PATH="$HOME/Documents/app/gcal-nippo"
 export PATH="$HOME/.local/bin:$PATH"
 export PATH="/opt/homebrew/bin:$PATH"
 ### MANAGED BY RANCHER DESKTOP START (DO NOT EDIT)
@@ -177,8 +176,6 @@ export PATH="/Users/{{ .userName }}/.rd/bin:$PATH"
 ## alias
 alias aws_sso='aws sso login --sso-session'
 alias cl="clear"
-alias daily_nippo="docker run -it --rm -v $GCAL_NIPPO_PATH/log:/app/log gcal-nippo daily_nippo"
-alias digdag='docker run -it --rm -v /Users/{{ .userName }}/Documents/work/isis/ccmp_support_sys_mail:/src --mount source=digdag,target=/root/.config digdag-local'
 alias g='git'
 alias ls='eza --icons'
 alias ll='eza --icons -al --group-directories-first'

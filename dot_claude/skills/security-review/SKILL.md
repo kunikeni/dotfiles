@@ -482,13 +482,19 @@ Before ANY production deployment:
 - [ ] **File Uploads**: Validated (size, type)
 - [ ] **Wallet Signatures**: Verified (if blockchain)
 
+## Security Response Protocol
+
+セキュリティ問題が発見された場合:
+
+1. STOP immediately
+2. Use **security-reviewer** agent
+3. Fix CRITICAL issues before continuing
+4. Rotate any exposed secrets
+5. Review entire codebase for similar issues
+
 ## Resources
 
 - [OWASP Top 10](https://owasp.org/www-project-top-ten/)
 - [Next.js Security](https://nextjs.org/docs/security)
 - [Supabase Security](https://supabase.com/docs/guides/auth)
 - [Web Security Academy](https://portswigger.net/web-security)
-
----
-
-**Remember**: Security is not optional. One vulnerability can compromise the entire platform. When in doubt, err on the side of caution.
