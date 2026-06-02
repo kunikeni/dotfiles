@@ -1,0 +1,18 @@
+model_provider = "amazon-bedrock"
+model = {{ .codex_model | quote }}
+web_search = "disabled"
+
+[model_providers.amazon-bedrock]
+[model_providers.amazon-bedrock.aws]
+profile = {{ .codex_profile | quote }}
+region = "us-east-2"
+
+[features]
+multi_agent = true
+
+[tui]
+status_line = ["model-with-reasoning", "current-dir", "project-name", "git-branch", "context-used", "used-tokens", "total-input-tokens", "total-output-tokens"]
+status_line_use_colors = true
+
+[tui.model_availability_nux]
+"openai.gpt-5.5" = 4

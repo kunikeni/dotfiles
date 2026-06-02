@@ -1,0 +1,13 @@
+[data]
+    gitName = ""
+    userEmail = ""
+    userName = ""
+    HOMEBREW_GITHUB_API_TOKEN = ""
+    claude_aws_profile = ""
+    claude_model = ""
+    codex_profile = ""
+    codex_model = ""
+
+[template]
+    leftDelimiter = "{{{"
+    rightDelimiter = "}}}"

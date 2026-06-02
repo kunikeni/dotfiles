@@ -38,7 +38,7 @@ $azure\
 $memory_usage\
 $jobs\
 $mise
-$character
+$character\
 """
 right_format = ""
 continuation_prompt = "[∙](bright-black) "

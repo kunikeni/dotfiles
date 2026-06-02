@@ -1,4 +1,8 @@
 {
+  "[csharp]": {
+    "editor.defaultFormatter": "ms-dotnettools.csharp",
+    "editor.formatOnSave": true
+  },
   "[css]": {
     "editor.tabSize": 2
   },
@@ -64,13 +68,16 @@
   },
   "[terraform]": {
     "editor.defaultFormatter": "hashicorp.terraform",
-    "editor.formatOnSaveMode": "file"
+    "editor.formatOnSaveMode": "file",
+    "editor.tabSize": 2
   },
   "[typescript]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.tabSize": 2
   },
   "[typescriptreact]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.tabSize": 2
   },
   "chat.tools.terminal.autoApprove": {
     "awk": false,
@@ -114,7 +121,7 @@
     "strings": "inline"
   },
   "editor.unicodeHighlight.invisibleCharacters": false,
-  "editor.wordSeparators": "`~!@#$%^&*()=+[{]}\\|;:'\",.<>/?、。（）",
+  "editor.wordSeparators": "`~!@#$%^&*()=+[{]}\\|;:'\",.<>/?：、。（）",
   "errorLens.messageEnabled": false,
   "explorer.confirmDelete": false,
   "explorer.confirmDragAndDrop": false,
@@ -136,6 +143,7 @@
   "makefile.configureOnOpen": true,
   "notebook.formatOnSave.enabled": true,
   "notebook.lineNumbers": "on",
+  "path-intellisense.autoSlashAfterDirectory": true,
   "path-intellisense.showHiddenFiles": true,
   "python.analysis.autoFormatStrings": true,
   "python.analysis.diagnosticSeverityOverrides": {
@@ -148,6 +156,8 @@
   "python.analysis.typeCheckingMode": "standard",
   "python.autoComplete.extraPaths": [],
   "python.languageServer": "Pylance",
+  "python.terminal.activateEnvironment": false,
+  "python.terminal.useEnvFile": true,
   "python.testing.pytestEnabled": true,
   "remote.extensionKind": {
     "GitHub.copilot": [
