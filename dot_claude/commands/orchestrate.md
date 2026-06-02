@@ -1,172 +1,162 @@
+---
+name: orchestrate
+description: Planner → Generator ⇄ Evaluator のフィードバックループを実行。最大3イテレーションで収束させる。
+---
+
 # Orchestrate Command
 
-Sequential agent workflow for complex tasks.
+`/orchestrate [task-description]`
 
-## Usage
-
-`/orchestrate [workflow-type] [task-description]`
-
-## Workflow Types
-
-### feature
-Full feature implementation workflow:
-```
-planner -> tdd-guide -> code-reviewer -> security-reviewer
-```
-
-### bugfix
-Bug investigation and fix workflow:
-```
-explorer -> tdd-guide -> code-reviewer
-```
-
-### refactor
-Safe refactoring workflow:
-```
-architect -> code-reviewer -> tdd-guide
-```
-
-### security
-Security-focused review:
-```
-security-reviewer -> code-reviewer -> architect
-```
-
-## Execution Pattern
-
-For each agent in the workflow:
-
-1. **Invoke agent** with context from previous agent
-2. **Collect output** as structured handoff document
-3. **Pass to next agent** in chain
-4. **Aggregate results** into final report
-
-## Handoff Document Format
-
-Between agents, create handoff document:
-
-```markdown
-## HANDOFF: [previous-agent] -> [next-agent]
-
-### Context
-[Summary of what was done]
-
-### Findings
-[Key discoveries or decisions]
-
-### Files Modified
-[List of files touched]
-
-### Open Questions
-[Unresolved items for next agent]
-
-### Recommendations
-[Suggested next steps]
-```
-
-## Example: Feature Workflow
+## Flow
 
 ```
-/orchestrate feature "Add user authentication"
+[User Input] → [Planner] → [Generator] ⇄ [Evaluator] → [Deliverable]
+                  ↑                           |
+                  └──── feedback (REDESIGN) ──┘
 ```
 
-Executes:
+## Execution Steps
 
-1. **Planner Agent**
-   - Analyzes requirements
-   - Creates implementation plan
-   - Identifies dependencies
-   - Output: `HANDOFF: planner -> tdd-guide`
+### Phase 1: Planning
 
-2. **TDD Guide Agent**
-   - Reads planner handoff
-   - Writes tests first
-   - Implements to pass tests
-   - Output: `HANDOFF: tdd-guide -> code-reviewer`
+Invoke the **planner** agent (model: opus):
 
-3. **Code Reviewer Agent**
-   - Reviews implementation
-   - Checks for issues
-   - Suggests improvements
-   - Output: `HANDOFF: code-reviewer -> security-reviewer`
+- Pass the full task description from user input
+- Planner analyzes codebase, makes design decisions, outputs implementation plan
+- Present plan to user **in full**
+- **HARD STOP**: Do NOT proceed to Phase 2 until user explicitly approves
+  - Approval examples: "OK", "go ahead", "LGTM", "approve"
+  - If user requests changes, re-invoke Planner with revised requirements
+  - Ambiguous responses ("hmm", "I see") are NOT approval. Ask for explicit confirmation
+- Once approved, update the `## Approval` checkbox in the plan file to `[x]`
+- Generator will not start if the Approval checkbox is unchecked
 
-4. **Security Reviewer Agent**
-   - Security audit
-   - Vulnerability check
-   - Final approval
-   - Output: Final Report
-
-## Final Report Format
+### Phase 2: Generation Loop (max 3 iterations)
 
 ```
-ORCHESTRATION REPORT
-====================
-Workflow: feature
-Task: Add user authentication
-Agents: planner -> tdd-guide -> code-reviewer -> security-reviewer
-
-SUMMARY
--------
-[One paragraph summary]
-
-AGENT OUTPUTS
--------------
-Planner: [summary]
-TDD Guide: [summary]
-Code Reviewer: [summary]
-Security Reviewer: [summary]
-
-FILES CHANGED
--------------
-[List all files modified]
-
-TEST RESULTS
-------------
-[Test pass/fail summary]
-
-SECURITY STATUS
----------------
-[Security findings]
-
-RECOMMENDATION
---------------
-[SHIP / NEEDS WORK / BLOCKED]
+iteration = 0
+while iteration < 3:
+    1. Invoke **generator** agent with:
+       - The plan file path
+       - Previous evaluator feedback (if iteration > 0)
+    2. Invoke **evaluator** agent with:
+       - The plan file path
+       - The git diff of generator's changes
+    3. Check evaluator verdict:
+       - PASS → exit loop, proceed to completion
+       - REVISE → increment iteration, pass feedback to generator
+       - REDESIGN → pass feedback to planner, get revised plan, reset iteration
 ```
 
-## Parallel Execution
+### Phase 3: Completion
 
-For independent checks, run agents in parallel:
+- Report final status to user
+- List files changed
+- Summarize test results
 
-```markdown
-### Parallel Phase
-Run simultaneously:
-- code-reviewer (quality)
-- security-reviewer (security)
-- architect (design)
+## Prompt Templates
 
-### Merge Results
-Combine outputs into single report
+### Planner Prompt
+
 ```
+Task: {user_task_description}
+
+Working directory: {cwd}
+Relevant context: {any user-provided context}
+
+Produce a complete implementation plan following your system prompt format.
+Include design decisions with rationale, ordered steps with file paths,
+test strategy, and success criteria.
+```
+
+### Generator Prompt (iteration 0)
+
+```
+## Plan
+
+Read the plan file at: .claude/plan/{slug}.md
+
+## Instructions
+
+Implement the plan step by step using TDD methodology.
+For each step: write test (RED) → implement (GREEN) → fix build → refactor.
+Report each step's status. If blocked, report what is unclear and stop.
+```
+
+### Generator Prompt (iteration > 0)
+
+```
+## Plan
+
+Read the plan file at: .claude/plan/{slug}.md
+
+## Previous Evaluator Feedback
+
+{evaluator_feedback}
+
+## Instructions
+
+Fix the issues identified by the Evaluator above.
+For CRITICAL and HIGH issues: fix all of them.
+For MEDIUM issues: fix if straightforward.
+After fixing, run the full test suite and report results.
+```
+
+### Evaluator Prompt
+
+```
+## Plan Context
+
+Read the plan file at: .claude/plan/{slug}.md
+
+## Changes to Evaluate
+
+Run `git diff` to see all changes made by the Generator.
+Read each modified file in full context.
+
+Evaluate against: Security, Correctness, Code Quality, Performance, Test Quality.
+Output your verdict (PASS / REVISE / REDESIGN) with structured feedback.
+For each issue, include file:line and specific fix instructions.
+Specify whether feedback targets Generator or Planner.
+```
+
+## Iteration Limits
+
+- **Max iterations**: 3 (Generator ⇄ Evaluator)
+- **REDESIGN**: Returns to Planner once. If second REDESIGN occurs, escalate to user.
+- **After 3 iterations without PASS**: Stop and report remaining issues to user for decision.
+
+## Key Constraints
+
+- Agents cannot see each other's conversation history
+- All context must be explicitly passed in prompts
+- Agents cannot invoke other agents (no nesting)
+- The main loop (this orchestration) controls all flow
+- File-based data exchange for large outputs (plans, reports)
 
 ## Arguments
 
-$ARGUMENTS:
-- `feature <description>` - Full feature workflow
-- `bugfix <description>` - Bug fix workflow
-- `refactor <description>` - Refactoring workflow
-- `security <description>` - Security review workflow
-- `custom <agents> <description>` - Custom agent sequence
+$ARGUMENTS: The task description to implement
 
-## Custom Workflow Example
+## Workflow Types
+
+Shorthand aliases (all follow the same loop, with adjusted Planner scope):
+
+- `/orchestrate feature <desc>` - Full feature with architecture decisions
+- `/orchestrate bugfix <desc>` - Bug investigation (Planner focuses on root cause)
+- `/orchestrate refactor <desc>` - Safe refactoring (Planner focuses on preserving behavior)
+
+## Example
 
 ```
-/orchestrate custom "architect,tdd-guide,code-reviewer" "Redesign caching layer"
+User: /orchestrate feature "Add rate limiting to API endpoints"
+
+-> Planner (opus): analyzes codebase, designs rate limiting strategy,
+   outputs plan with middleware approach, Redis counter, per-endpoint config
+-> User confirms plan
+-> Generator (sonnet) iteration 1: implements tests + code
+-> Evaluator (sonnet) iteration 1: REVISE - missing edge case for burst traffic
+-> Generator (sonnet) iteration 2: fixes edge case, adds burst test
+-> Evaluator (sonnet) iteration 2: PASS
+-> Done: report to user
 ```
-
-## Tips
-
-1. **Start with planner** for complex features
-2. **Always include code-reviewer** before merge
-3. **Use security-reviewer** for auth/payment/PII
-4. **Keep handoffs concise** - focus on what next agent needs
-5. **Run verification** between agents if needed

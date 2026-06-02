@@ -30,14 +30,14 @@ When creating PRs:
    - Break down into phases
 
 2. **TDD Approach**
-   - Use **tdd-guide** agent
+   - Use **generator** agent (or `/tdd` command)
    - Write tests first (RED)
    - Implement to pass tests (GREEN)
    - Refactor (IMPROVE)
    - Verify 80%+ coverage
 
 3. **Code Review**
-   - Use **code-reviewer** agent immediately after writing code
+   - Use **evaluator** agent (or `/code-review` command) immediately after writing code
    - Address CRITICAL and HIGH issues
    - Fix MEDIUM issues when possible
 

@@ -202,7 +202,7 @@ function renderUserContent(html: string) {
     ALLOWED_TAGS: ['b', 'i', 'em', 'strong', 'p'],
     ALLOWED_ATTR: []
   })
-  return <div dangerouslySetInnerHTML={{ __html: clean }} />
+  return <div dangerouslySetInnerHTML={{ "{{" }} __html: clean {{ "}}" }} />
 }
 ```
 
@@ -487,7 +487,7 @@ Before ANY production deployment:
 セキュリティ問題が発見された場合:
 
 1. STOP immediately
-2. Use **security-reviewer** agent
+2. Use **evaluator** agent (or `/code-review` command)
 3. Fix CRITICAL issues before continuing
 4. Rotate any exposed secrets
 5. Review entire codebase for similar issues

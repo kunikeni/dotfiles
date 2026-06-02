@@ -12,7 +12,7 @@ function y() {
 	if cwd="$(command cat -- "$tmp")" && [ -n "$cwd" ] && [ "$cwd" != "$PWD" ]; then
 		builtin cd -- "$cwd"
 	fi
-	rm -f -- "$tmp"
+	command rm -f -- "$tmp"
 }
 
 on_demand_completion() {
@@ -57,6 +57,9 @@ export PATH="/Users/{{ .userName }}/.rd/bin:$PATH"
 ## alias
 alias aws_sso='aws sso login --sso-session'
 alias cl="clear"
+if [[ ! -t 0 ]]; then
+  alias rm='trash'
+fi
 alias g='git'
 alias ls='eza --icons'
 alias ll='eza --icons -al --group-directories-first'

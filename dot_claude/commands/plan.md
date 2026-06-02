@@ -1,5 +1,6 @@
 ---
-description: Restate requirements, assess risks, and create step-by-step implementation plan. WAIT for user CONFIRM before touching any code.
+name: plan
+description: planner エージェントで要件分析・設計判断・実装計画を作成。ユーザーの明示的な承認を待ってから実装に進む。
 ---
 
 # Plan Command
@@ -8,106 +9,69 @@ This command invokes the **planner** agent to create a comprehensive implementat
 
 ## What This Command Does
 
-1. **Restate Requirements** - Clarify what needs to be built
-2. **Identify Risks** - Surface potential issues and blockers
-3. **Create Step Plan** - Break down implementation into phases
-4. **Wait for Confirmation** - MUST receive user approval before proceeding
+1. **Analyze Requirements** - Restate and clarify what needs to be built
+2. **Read Codebase** - Identify existing patterns and affected components
+3. **Make Design Decisions** - Document choices with rationale
+4. **Output Plan File** - Write to `.claude/plan/<slug>.md`
+5. **Wait for Approval** - MUST receive explicit user approval before Generator proceeds
 
 ## When to Use
 
 Use `/plan` when:
+
 - Starting a new feature
 - Making significant architectural changes
 - Working on complex refactoring
 - Multiple files/components will be affected
 - Requirements are unclear or ambiguous
 
-## How It Works
+## Plan Output Format
 
-The planner agent will:
+The plan is written to `.claude/plan/<slug>.md` with this structure:
 
-1. **Analyze the request** and restate requirements in clear terms
-2. **Break down into phases** with specific, actionable steps
-3. **Identify dependencies** between components
-4. **Assess risks** and potential blockers
-5. **Estimate complexity** (High/Medium/Low)
-6. **Present the plan** and WAIT for your explicit confirmation
+```markdown
+# Plan: [Title]
 
-## Example Usage
+## Approval
+- [ ] Reviewed and approved by user
 
-```
-User: /plan I need to add real-time notifications when markets resolve
+## Overview
+[2-3 sentences]
 
-Agent (planner):
-# Implementation Plan: Real-Time Market Resolution Notifications
+## Design Decisions
+[Each decision with rationale]
 
-## Requirements Restatement
-- Send notifications to users when markets they're watching resolve
-- Support multiple notification channels (in-app, email, webhook)
-- Ensure notifications are delivered reliably
-- Include market outcome and user's position result
+## Steps (ordered)
+1. [Step]: [file path]
+   - What: specific action
+   - Why: reason
+   - Test: how to verify
 
-## Implementation Phases
-
-### Phase 1: Database Schema
-- Add notifications table with columns: id, user_id, market_id, type, status, created_at
-- Add user_notification_preferences table for channel preferences
-- Create indexes on user_id and market_id for performance
-
-### Phase 2: Notification Service
-- Create notification service in lib/notifications.ts
-- Implement notification queue using BullMQ/Redis
-- Add retry logic for failed deliveries
-- Create notification templates
-
-### Phase 3: Integration Points
-- Hook into market resolution logic (when status changes to "resolved")
-- Query all users with positions in market
-- Enqueue notifications for each user
-
-### Phase 4: Frontend Components
-- Create NotificationBell component in header
-- Add NotificationList modal
-- Implement real-time updates via Supabase subscriptions
-- Add notification preferences page
-
-## Dependencies
-- Redis (for queue)
-- Email service (SendGrid/Resend)
-- Supabase real-time subscriptions
-
+## Test Strategy
 ## Risks
-- HIGH: Email deliverability (SPF/DKIM required)
-- MEDIUM: Performance with 1000+ users per market
-- MEDIUM: Notification spam if markets resolve frequently
-- LOW: Real-time subscription overhead
-
-## Estimated Complexity: MEDIUM
-- Backend: 4-6 hours
-- Frontend: 3-4 hours
-- Testing: 2-3 hours
-- Total: 9-13 hours
-
-**WAITING FOR CONFIRMATION**: Proceed with this plan? (yes/no/modify)
+## Success Criteria
 ```
 
-## Important Notes
+## Approval Flow
 
-**CRITICAL**: The planner agent will **NOT** write any code until you explicitly confirm the plan with "yes" or "proceed" or similar affirmative response.
-
-If you want changes, respond with:
-- "modify: [your changes]"
-- "different approach: [alternative]"
-- "skip phase 2 and do phase 3 first"
+- The plan is presented to the user in full
+- User must explicitly approve ("OK", "go ahead", "LGTM", "approve")
+- Ambiguous responses are NOT approval
+- Once approved, the Approval checkbox is updated to `[x]`
+- Generator will not start if the checkbox is unchecked
 
 ## Integration with Other Commands
 
 After planning:
-- Use `/tdd` to implement with test-driven development
-- Use `/build-and-fix` if build errors occur
-- Use `/code-review` to review completed implementation
 
-## Related Agents
+- Use `/orchestrate` to run the full pipeline (plan is already done)
+- Use `/tdd` to implement a single step with TDD
+- Generator reads the plan file directly
 
-This command invokes the `planner` agent located at:
-`~/.claude/agents/planner.md`
+## Related
+
+This command invokes the `planner` agent (model: opus).
+
+## Arguments
+
+$ARGUMENTS: Description of what to plan

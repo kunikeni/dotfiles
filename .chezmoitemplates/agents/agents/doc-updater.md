@@ -26,18 +26,6 @@ You are a documentation specialist focused on keeping codemaps and documentation
 - **madge** - Dependency graph visualization
 - **jsdoc-to-markdown** - Generate docs from JSDoc comments
 
-### Analysis Commands
-
-```bash
-# Analyze Python project structure
-python -m py_compile src/
-
-# Generate dependency graph
-pipdeptree
-
-# Extract docstrings
-python -c "import ast; print(ast.get_docstring(...))"
-```
 
 ## Codemap Generation Workflow
 

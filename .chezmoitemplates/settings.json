@@ -168,7 +168,7 @@
   "typescript.updateImportsOnFileMove.enabled": "always",
   "update.showReleaseNotes": false,
   "window.confirmSaveUntitledWorkspace": false,
-  "workbench.colorTheme": "Default Dark+",
+  "workbench.colorTheme": "Dark+",
   "workbench.editorAssociations": {
     "*.obj": "default",
     "*.pdf": "default"
