@@ -48,6 +48,7 @@
       "Bash(uv run ruff check:*)",
       "Bash(uv run ruff format:*)",
       "Bash(uvx:*)",
+      "Bash(terraform apply:*)",
       "Bash(terraform destroy)",
       "Read(.env)",
       "Read(.env.local)",
@@ -57,6 +58,7 @@
     ],
     "defaultMode": "default"
   },
+  "awsAuthRefresh": "aws sso login --sso-session {{ .SSO_SESSION_NAME }}"
   "model": "us.anthropic.claude-opus-4-8",
   "statusLine": {
     "type": "command",

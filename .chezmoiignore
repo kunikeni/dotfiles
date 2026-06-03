@@ -2,6 +2,7 @@
 packages/**
 README.md
 cspell.json
+chezmoi.toml.template
 
 # --- Windows ---
 {{ if eq .chezmoi.os "windows" }}

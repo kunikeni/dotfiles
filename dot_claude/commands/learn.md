@@ -1,3 +1,8 @@
+---
+name: learn
+description: 現在のセッションを分析し、スキルとして保存する価値のあるパターンを抽出。再利用可能なパターンを自動的に学習。
+---
+
 # /learn - Extract Reusable Patterns
 
 Analyze the current session and extract any patterns worth saving as skills.

@@ -1,11 +1,8 @@
-<<<<<<< HEAD
-=======
 ---
 name: build-fix
 description: ビルド・型エラーを段階的に修正。エラーを解析し、根本原因を特定し、最小限の修正を適用して検証。
 ---
 
->>>>>>> 7440b9b (サブエージェント整備)
 # Build and Fix
 
 Invoke the **generator** agent to incrementally fix build errors:

@@ -1,3 +1,8 @@
+---
+name: update-docs
+description: ドキュメントをソースオブトゥルースから同期。スクリプト リファレンス、環境変数、ランブック を自動生成。
+---
+
 # Update Documentation
 
 Sync documentation from source-of-truth:

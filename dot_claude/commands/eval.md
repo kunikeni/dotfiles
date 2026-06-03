@@ -1,3 +1,8 @@
+---
+name: eval
+description: Eval 駆動開発ワークフローを管理。機能評価を定義、実行、レポートして開発を検証。
+---
+
 # Eval Command
 
 Manage eval-driven development workflow.
@@ -31,7 +36,7 @@ Created: $(date)
 - pass^3 = 100% for regression evals
 ```
 
-2. Prompt user to fill in specific criteria
+1. Prompt user to fill in specific criteria
 
 ## Check Evals
 
@@ -113,6 +118,7 @@ feature-export    [0/4 passing] NOT STARTED
 ## Arguments
 
 $ARGUMENTS:
+
 - `define <name>` - Create new eval definition
 - `check <name>` - Run and check evals
 - `report <name>` - Generate full report

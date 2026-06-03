@@ -1,3 +1,8 @@
+---
+name: refactor-clean
+description: テスト検証により安全にデッド コードを識別および削除。分析ツールを使用して不要なコードを検出。
+---
+
 # Refactor Clean
 
 Safely identify and remove dead code with test verification:

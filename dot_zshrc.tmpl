@@ -55,12 +55,13 @@ export PATH="/Users/{{ .userName }}/.rd/bin:$PATH"
 ### MANAGED BY RANCHER DESKTOP END (DO NOT EDIT)
 
 ## alias
-alias aws_sso='aws sso login --sso-session'
+alias aws_sso='aws sso login --sso-session {{ .SSO_SESSION_NAME }}'
 alias cl="clear"
 if [[ ! -t 0 ]]; then
   alias rm='trash'
 fi
 alias g='git'
+alias gp='git pull'
 alias ls='eza --icons'
 alias ll='eza --icons -al --group-directories-first'
 alias tree='eza --icons -al -T -L 2'
@@ -71,13 +72,23 @@ alias ctops='DOCKER_HOST=unix:///Users/{{ .userName }}/.rd/docker.sock ctop -s m
 alias fd='fd -H | fzf --height 30% --border'
 
 ## completion
+if [ -x "$(command -v brew)" ]; then
+  fpath=($(brew --prefix)/share/zsh-completions $fpath)
+fi
+
 # 初期化
 autoload bashcompinit && bashcompinit
 autoload -Uz compinit
 compinit
 
+if [ -f /opt/homebrew/share/zsh-autosuggestions/zsh-autosuggestions.zsh ]; then
+  source /opt/homebrew/share/zsh-autosuggestions/zsh-autosuggestions.zsh
+fi
+
 # AWS CLI
-complete -C '/opt/homebrew/bin/aws_completer' aws
+if [ -f /opt/homebrew/share/zsh-autosuggestions/zsh-autosuggestions.zsh ]; then
+  complete -C '/opt/homebrew/bin/aws_completer' aws
+fi
 
 # mise
 eval "$(mise activate zsh)"
@@ -91,4 +102,8 @@ eval "$(gh completion -s zsh)"
 
 # UI
 eval "$(starship init zsh)"
-eval "$(zoxide init zsh --cmd cd)"
+
+if [[ $- == *i* ]]; then
+  eval "$(zoxide init zsh --cmd cd)"
+  alias grep='rg'
+fi

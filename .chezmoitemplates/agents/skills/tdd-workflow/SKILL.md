@@ -1,6 +1,6 @@
 ---
 name: tdd-workflow
-description: Use this skill when writing new features, fixing bugs, or refactoring code. Enforces test-driven development with 80%+ coverage including unit, integration, and E2E tests.
+description: Python 向けテスト駆動開発。新機能、バグ修正、リファクタリング時に使用。pytest ユニット/統合/E2E テストで 80%+ カバレッジを確保。
 ---
 
 # Test-Driven Development Workflow
@@ -18,9 +18,11 @@ This skill ensures all code development follows TDD principles with comprehensiv
 ## Core Principles
 
 ### 1. Tests BEFORE Code
+
 ALWAYS write tests first, then implement code to make tests pass.
 
 ### 2. Coverage Requirements
+
 - Minimum 80% coverage (unit + integration + E2E)
 - All edge cases covered
 - Error scenarios tested
@@ -29,18 +31,21 @@ ALWAYS write tests first, then implement code to make tests pass.
 ### 3. Test Types
 
 #### Unit Tests
+
 - Individual functions and utilities
-- Component logic
+- Service logic
 - Pure functions
 - Helpers and utilities
 
 #### Integration Tests
+
 - API endpoints
 - Database operations
 - Service interactions
 - External API calls
 
 #### E2E Tests (Playwright)
+
 - Critical user flows
 - Complete workflows
 - Browser automation
@@ -49,6 +54,7 @@ ALWAYS write tests first, then implement code to make tests pass.
 ## TDD Workflow Steps
 
 ### Step 1: Write User Journeys
+
 ```
 As a [role], I want to [action], so that [benefit]
 
@@ -58,326 +64,447 @@ so that I can find relevant markets even without exact keywords.
 ```
 
 ### Step 2: Generate Test Cases
+
 For each user journey, create comprehensive test cases:
 
-```typescript
-describe('Semantic Search', () => {
-  it('returns relevant markets for query', async () => {
-    // Test implementation
-  })
+```python
+import pytest
 
-  it('handles empty query gracefully', async () => {
-    // Test edge case
-  })
+class TestSemanticSearch:
+    def test_returns_relevant_markets_for_query(self):
+        # Test implementation
+        pass
 
-  it('falls back to substring search when Redis unavailable', async () => {
-    // Test fallback behavior
-  })
+    def test_handles_empty_query_gracefully(self):
+        # Test edge case
+        pass
 
-  it('sorts results by similarity score', async () => {
-    // Test sorting logic
-  })
-})
+    def test_falls_back_to_substring_search_when_redis_unavailable(self):
+        # Test fallback behavior
+        pass
+
+    def test_sorts_results_by_similarity_score(self):
+        # Test sorting logic
+        pass
 ```
 
 ### Step 3: Run Tests (They Should Fail)
+
 ```bash
-npm test
+uv run pytest
 # Tests should fail - we haven't implemented yet
 ```
 
 ### Step 4: Implement Code
+
 Write minimal code to make tests pass:
 
-```typescript
-// Implementation guided by tests
-export async function searchMarkets(query: string) {
-  // Implementation here
-}
+```python
+# Implementation guided by tests
+async def search_markets(query: str) -> list[dict]:
+    # Implementation here
+    pass
 ```
 
 ### Step 5: Run Tests Again
+
 ```bash
-npm test
+uv run pytest
 # Tests should now pass
 ```
 
 ### Step 6: Refactor
+
 Improve code quality while keeping tests green:
+
 - Remove duplication
 - Improve naming
 - Optimize performance
 - Enhance readability
 
 ### Step 7: Verify Coverage
+
 ```bash
-npm run test:coverage
+uv run pytest --cov
 # Verify 80%+ coverage achieved
 ```
 
 ## Testing Patterns
 
-### Unit Test Pattern (Jest/Vitest)
-```typescript
-import { render, screen, fireEvent } from '@testing-library/react'
-import { Button } from './Button'
+### Unit Test Pattern (pytest)
 
-describe('Button Component', () => {
-  it('renders with correct text', () => {
-    render(<Button>Click me</Button>)
-    expect(screen.getByText('Click me')).toBeInTheDocument()
-  })
+```python
+import pytest
+from app.domain.entities.button import Button
 
-  it('calls onClick when clicked', () => {
-    const handleClick = jest.fn()
-    render(<Button onClick={handleClick}>Click</Button>)
+class TestButtonComponent:
+    def test_renders_with_correct_text(self):
+        button = Button(text="Click me")
+        assert button.text == "Click me"
 
-    fireEvent.click(screen.getByRole('button'))
+    def test_calls_on_click_when_clicked(self, mocker):
+        handle_click = mocker.Mock()
+        button = Button(text="Click", on_click=handle_click)
+        button.click()
+        assert handle_click.call_count == 1
 
-    expect(handleClick).toHaveBeenCalledTimes(1)
-  })
+    def test_is_disabled_when_disabled_true(self):
+        button = Button(text="Click", disabled=True)
+        assert button.is_disabled is True
 
-  it('is disabled when disabled prop is true', () => {
-    render(<Button disabled>Click</Button>)
-    expect(screen.getByRole('button')).toBeDisabled()
-  })
-})
+    def test_enabled_by_default(self):
+        button = Button(text="Click")
+        assert button.is_disabled is False
 ```
 
-### API Integration Test Pattern
-```typescript
-import { NextRequest } from 'next/server'
-import { GET } from './route'
+### API Integration Test Pattern (FastAPI + pytest)
 
-describe('GET /api/markets', () => {
-  it('returns markets successfully', async () => {
-    const request = new NextRequest('http://localhost/api/markets')
-    const response = await GET(request)
-    const data = await response.json()
+```python
+import pytest
+from httpx import AsyncClient
+from app.main import app
 
-    expect(response.status).toBe(200)
-    expect(data.success).toBe(true)
-    expect(Array.isArray(data.data)).toBe(true)
-  })
+@pytest.mark.asyncio
+class TestMarketsAPI:
+    async def test_returns_markets_successfully(self):
+        async with AsyncClient(app=app, base_url="http://test") as client:
+            response = await client.get("/api/markets")
+            
+            assert response.status_code == 200
+            data = response.json()
+            assert data["success"] is True
+            assert isinstance(data["data"], list)
 
-  it('validates query parameters', async () => {
-    const request = new NextRequest('http://localhost/api/markets?limit=invalid')
-    const response = await GET(request)
+    async def test_validates_query_parameters(self):
+        async with AsyncClient(app=app, base_url="http://test") as client:
+            response = await client.get("/api/markets?limit=invalid")
+            assert response.status_code == 400
 
-    expect(response.status).toBe(400)
-  })
-
-  it('handles database errors gracefully', async () => {
-    // Mock database failure
-    const request = new NextRequest('http://localhost/api/markets')
-    // Test error handling
-  })
-})
+    async def test_handles_database_errors_gracefully(self, mocker):
+        # Mock database failure
+        mocker.patch(
+            "app.infrastructure.repositories.market_repository.find_all",
+            side_effect=Exception("Database connection failed")
+        )
+        
+        async with AsyncClient(app=app, base_url="http://test") as client:
+            response = await client.get("/api/markets")
+            assert response.status_code == 500
+            data = response.json()
+            assert data["success"] is False
 ```
 
 ### E2E Test Pattern (Playwright)
-```typescript
-import { test, expect } from '@playwright/test'
 
-test('user can search and filter markets', async ({ page }) => {
-  // Navigate to markets page
-  await page.goto('/')
-  await page.click('a[href="/markets"]')
+```python
+import pytest
+from playwright.async_api import async_playwright, Page
 
-  // Verify page loaded
-  await expect(page.locator('h1')).toContainText('Markets')
+@pytest.mark.asyncio
+class TestMarketSearchE2E:
+    async def test_user_can_search_and_filter_markets(self):
+        async with async_playwright() as p:
+            browser = await p.chromium.launch()
+            page = await browser.new_page()
+            
+            # Navigate to markets page
+            await page.goto("http://localhost:3000/")
+            await page.click("a[href='/markets']")
+            
+            # Verify page loaded
+            h1 = page.locator("h1")
+            await h1.wait_for()
+            assert await h1.text_content() == "Markets"
+            
+            # Search for markets
+            await page.fill("input[placeholder='Search markets']", "election")
+            
+            # Wait for debounce
+            await page.wait_for_timeout(600)
+            
+            # Verify search results displayed
+            results = page.locator("[data-testid='market-card']")
+            count = await results.count()
+            assert count == 5
+            
+            # Verify results contain search term
+            first_result = results.first
+            text = await first_result.text_content()
+            assert "election" in text.lower()
+            
+            # Filter by status
+            await page.click("button:has-text('Active')")
+            
+            # Verify filtered results
+            count = await results.count()
+            assert count == 3
+            
+            await browser.close()
 
-  // Search for markets
-  await page.fill('input[placeholder="Search markets"]', 'election')
-
-  // Wait for debounce and results
-  await page.waitForTimeout(600)
-
-  // Verify search results displayed
-  const results = page.locator('[data-testid="market-card"]')
-  await expect(results).toHaveCount(5, { timeout: 5000 })
-
-  // Verify results contain search term
-  const firstResult = results.first()
-  await expect(firstResult).toContainText('election', { ignoreCase: true })
-
-  // Filter by status
-  await page.click('button:has-text("Active")')
-
-  // Verify filtered results
-  await expect(results).toHaveCount(3)
-})
-
-test('user can create a new market', async ({ page }) => {
-  // Login first
-  await page.goto('/creator-dashboard')
-
-  // Fill market creation form
-  await page.fill('input[name="name"]', 'Test Market')
-  await page.fill('textarea[name="description"]', 'Test description')
-  await page.fill('input[name="endDate"]', '2025-12-31')
-
-  // Submit form
-  await page.click('button[type="submit"]')
-
-  // Verify success message
-  await expect(page.locator('text=Market created successfully')).toBeVisible()
-
-  // Verify redirect to market page
-  await expect(page).toHaveURL(/\/markets\/test-market/)
-})
+    async def test_user_can_create_new_market(self):
+        async with async_playwright() as p:
+            browser = await p.chromium.launch()
+            page = await browser.new_page()
+            
+            # Navigate to creator dashboard
+            await page.goto("http://localhost:3000/creator-dashboard")
+            
+            # Fill market creation form
+            await page.fill("input[name='name']", "Test Market")
+            await page.fill("textarea[name='description']", "Test description")
+            await page.fill("input[name='endDate']", "2025-12-31")
+            
+            # Submit form
+            await page.click("button[type='submit']")
+            
+            # Verify success message
+            success_msg = page.locator("text=Market created successfully")
+            await success_msg.wait_for()
+            assert await success_msg.is_visible()
+            
+            # Verify redirect to market page
+            await page.wait_for_url("/markets/test-market*")
+            
+            await browser.close()
 ```
 
 ## Test File Organization
 
 ```
 src/
-├── components/
-│   ├── Button/
-│   │   ├── Button.tsx
-│   │   ├── Button.test.tsx          # Unit tests
-│   │   └── Button.stories.tsx       # Storybook
-│   └── MarketCard/
-│       ├── MarketCard.tsx
-│       └── MarketCard.test.tsx
 ├── app/
-│   └── api/
-│       └── markets/
-│           ├── route.ts
-│           └── route.test.ts         # Integration tests
-└── e2e/
-    ├── markets.spec.ts               # E2E tests
-    ├── trading.spec.ts
-    └── auth.spec.ts
+│   ├── domain/
+│   │   ├── entities/
+│   │   │   ├── button.py
+│   │   │   └── market.py
+│   │   ├── services/
+│   │   │   └── search_service.py
+│   │   └── interfaces/
+│   │       └── repository.py
+│   ├── usecase/
+│   │   └── market_use_case.py
+│   ├── api/
+│   │   └── markets_router.py
+│   └── infrastructure/
+│       ├── repositories/
+│       │   └── market_repository.py
+│       └── providers/
+│           └── external_provider.py
+└── tests/
+    ├── unit/
+    │   ├── test_button.py              # Unit tests
+    │   ├── test_search_service.py
+    │   └── test_market_entity.py
+    ├── integration/
+    │   ├── test_markets_api.py         # Integration tests
+    │   └── test_market_repository.py
+    └── e2e/
+        ├── test_markets_search.py       # E2E tests
+        ├── test_market_creation.py
+        └── test_auth.py
 ```
 
 ## Mocking External Services
 
-### Supabase Mock
-```typescript
-jest.mock('@/lib/supabase', () => ({
-  supabase: {
-    from: jest.fn(() => ({
-      select: jest.fn(() => ({
-        eq: jest.fn(() => Promise.resolve({
-          data: [{ id: 1, name: 'Test Market' }],
-          error: null
-        }))
-      }))
-    }))
-  }
-}))
+### Database Mock (SQLAlchemy)
+
+```python
+import pytest
+from unittest.mock import AsyncMock
+from app.infrastructure.repositories.market_repository import MarketRepository
+
+@pytest.fixture
+def mock_market_repo(mocker):
+    repo = AsyncMock(spec=MarketRepository)
+    repo.find_by_id = AsyncMock(return_value={
+        "id": 1,
+        "name": "Test Market",
+        "description": "Test description"
+    })
+    repo.find_all = AsyncMock(return_value=[
+        {"id": 1, "name": "Test Market 1"},
+        {"id": 2, "name": "Test Market 2"}
+    ])
+    return repo
+
+def test_with_mocked_repository(mock_market_repo):
+    # Use mocked repository in tests
+    result = mock_market_repo.find_by_id(1)
+    assert result["name"] == "Test Market"
 ```
 
 ### Redis Mock
-```typescript
-jest.mock('@/lib/redis', () => ({
-  searchMarketsByVector: jest.fn(() => Promise.resolve([
-    { slug: 'test-market', similarity_score: 0.95 }
-  ])),
-  checkRedisHealth: jest.fn(() => Promise.resolve({ connected: true }))
-}))
+
+```python
+import pytest
+from unittest.mock import AsyncMock
+
+@pytest.fixture
+def mock_redis(mocker):
+    redis = AsyncMock()
+    redis.search_markets_by_vector = AsyncMock(return_value=[
+        {"slug": "test-market", "similarity_score": 0.95},
+        {"slug": "another-market", "similarity_score": 0.87}
+    ])
+    redis.check_health = AsyncMock(return_value={"connected": True})
+    return redis
+
+@pytest.mark.asyncio
+async def test_with_redis_mock(mock_redis):
+    results = await mock_redis.search_markets_by_vector("query")
+    assert len(results) == 2
+    assert results[0]["similarity_score"] == 0.95
 ```
 
-### OpenAI Mock
-```typescript
-jest.mock('@/lib/openai', () => ({
-  generateEmbedding: jest.fn(() => Promise.resolve(
-    new Array(1536).fill(0.1) // Mock 1536-dim embedding
-  ))
-}))
+### External API Mock (OpenAI)
+
+```python
+import pytest
+from unittest.mock import AsyncMock
+
+@pytest.fixture
+def mock_openai(mocker):
+    client = AsyncMock()
+    # Mock 1536-dim embedding
+    embedding = [0.1] * 1536
+    client.embeddings.create = AsyncMock(return_value={
+        "data": [{"embedding": embedding}]
+    })
+    return client
+
+@pytest.mark.asyncio
+async def test_with_openai_mock(mock_openai):
+    result = await mock_openai.embeddings.create("test query")
+    embedding = result["data"][0]["embedding"]
+    assert len(embedding) == 1536
+    assert embedding[0] == 0.1
 ```
 
 ## Test Coverage Verification
 
 ### Run Coverage Report
+
 ```bash
-npm run test:coverage
+uv run pytest --cov
 ```
 
-### Coverage Thresholds
-```json
-{
-  "jest": {
-    "coverageThresholds": {
-      "global": {
-        "branches": 80,
-        "functions": 80,
-        "lines": 80,
-        "statements": 80
-      }
-    }
-  }
-}
+### Generate HTML Coverage Report
+
+```bash
+uv run pytest --cov --cov-report=html
+# Open htmlcov/index.html in browser
+```
+
+### Coverage Thresholds (pytest.ini or pyproject.toml)
+
+```ini
+[tool:pytest]
+addopts = --cov=app --cov-report=term-missing --cov-fail-under=80
+```
+
+Or in `pyproject.toml`:
+
+```toml
+[tool.pytest.ini_options]
+addopts = "--cov=app --cov-report=term-missing --cov-fail-under=80"
 ```
 
 ## Common Testing Mistakes to Avoid
 
 ### ❌ WRONG: Testing Implementation Details
-```typescript
-// Don't test internal state
-expect(component.state.count).toBe(5)
+
+```python
+# Don't test internal state
+def test_counter_state():
+    counter = Counter()
+    counter.increment()
+    assert counter._count == 1  # Implementation detail
 ```
 
 ### ✅ CORRECT: Test User-Visible Behavior
-```typescript
-// Test what users see
-expect(screen.getByText('Count: 5')).toBeInTheDocument()
+
+```python
+# Test what users see
+def test_counter_increments():
+    counter = Counter()
+    result = counter.increment()
+    assert result == 1
 ```
 
 ### ❌ WRONG: Brittle Selectors
-```typescript
-// Breaks easily
-await page.click('.css-class-xyz')
+
+```python
+# Breaks easily
+await page.click(".css-class-xyz")
 ```
 
 ### ✅ CORRECT: Semantic Selectors
-```typescript
-// Resilient to changes
-await page.click('button:has-text("Submit")')
-await page.click('[data-testid="submit-button"]')
+
+```python
+# Resilient to changes
+await page.click("button:has-text('Submit')")
+await page.click("[data-testid='submit-button']")
 ```
 
 ### ❌ WRONG: No Test Isolation
-```typescript
-// Tests depend on each other
-test('creates user', () => { /* ... */ })
-test('updates same user', () => { /* depends on previous test */ })
+
+```python
+# Tests depend on each other
+@pytest.fixture(scope="module")
+def shared_user():
+    return create_user("test@example.com")
+
+def test_creates_user(shared_user):
+    # Uses shared fixture
+    pass
+
+def test_updates_same_user(shared_user):
+    # Depends on previous test
+    pass
 ```
 
 ### ✅ CORRECT: Independent Tests
-```typescript
-// Each test sets up its own data
-test('creates user', () => {
-  const user = createTestUser()
-  // Test logic
-})
 
-test('updates user', () => {
-  const user = createTestUser()
-  // Update logic
-})
+```python
+# Each test creates its own data
+def test_creates_user():
+    user = create_test_user("user1@example.com")
+    assert user.email == "user1@example.com"
+
+def test_updates_user():
+    user = create_test_user("user2@example.com")
+    user.update_email("newemail@example.com")
+    assert user.email == "newemail@example.com"
 ```
 
 ## Continuous Testing
 
 ### Watch Mode During Development
+
 ```bash
-npm test -- --watch
+uv run pytest --watch
 # Tests run automatically on file changes
 ```
 
-### Pre-Commit Hook
+Or using pytest-watch:
+
 ```bash
-# Runs before every commit
-npm test && npm run lint
+pip install pytest-watch
+ptw
+```
+
+### Pre-Commit Hook
+
+```bash
+uv run pytest && uv run lint
 ```
 
 ### CI/CD Integration
+
 ```yaml
 # GitHub Actions
 - name: Run Tests
-  run: npm test -- --coverage
+  run: uv run pytest --cov
 - name: Upload Coverage
   uses: codecov/codecov-action@v3
 ```
@@ -389,10 +516,10 @@ npm test && npm run lint
 3. **Descriptive Test Names** - Explain what's tested
 4. **Arrange-Act-Assert** - Clear test structure
 5. **Mock External Dependencies** - Isolate unit tests
-6. **Test Edge Cases** - Null, undefined, empty, large
+6. **Test Edge Cases** - None, empty, boundary, large values
 7. **Test Error Paths** - Not just happy paths
 8. **Keep Tests Fast** - Unit tests < 50ms each
-9. **Clean Up After Tests** - No side effects
+9. **Clean Up After Tests** - Use fixtures for automatic cleanup
 10. **Review Coverage Reports** - Identify gaps
 
 ## Prohibited

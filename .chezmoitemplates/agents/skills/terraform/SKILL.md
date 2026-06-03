@@ -9,7 +9,7 @@ description: Terraform (AWS) 開発規約。ディレクトリ構成、命名規
 
 - Terraform 1.12+、AWS Provider 最新安定版
 - `terraform fmt` + `terraform validate` + tflint + trivy 必須
-- AWS プロファイル: dev=`<profile>-dev`, prd=`<profile>-prod`（`--profile` 必須、`providers.tf` で明示）
+- AWS プロファイル: `--profile` 必須、`providers.tf` で明示
 
 ## ツール設定ファイル
 
@@ -54,7 +54,7 @@ terraform/
 
 ## 状態管理
 
-- S3 バックエンド必須: `<profile>-tfstate-{environment}` / `{component}/terraform.tfstate`
+- S3 バックエンド必須: `{component}/terraform.tfstate`
 - 暗号化必須（`encrypt = true`）、DynamoDB ロック必須
 - ローカル state 禁止。環境 x コンポーネントで分離
 - `terraform_remote_state` で他 state 参照（ID ハードコード禁止）

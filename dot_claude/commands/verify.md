@@ -1,3 +1,8 @@
+---
+name: verify
+description: 現在のコードベース状態で包括的な検証を実行。ビルド、型チェック、リント、テストを順序付きで実行。
+---
+
 # Verification Command
 
 Run comprehensive verification on current codebase state.

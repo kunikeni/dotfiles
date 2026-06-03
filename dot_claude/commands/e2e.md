@@ -1,5 +1,6 @@
 ---
-description: Generate and run end-to-end tests with Playwright. Creates test journeys, runs tests, captures screenshots/videos/traces, and uploads artifacts.
+name: e2e
+description: Playwright を使用したエンドツーエンド テストを生成して実行。テスト ジャーニーを作成し、テストを実行し、スクリーンショット/ビデオ/トレースをキャプチャしてアップロード。
 ---
 
 # E2E Command
@@ -17,6 +18,7 @@ This command invokes the **e2e-runner** agent to generate, maintain, and execute
 ## When to Use
 
 Use `/e2e` when:
+
 - Testing critical user journeys (login, trading, payments)
 - Verifying multi-step flows work end-to-end
 - Testing UI interactions and navigation
@@ -200,6 +202,7 @@ View report: npx playwright show-report
 ```
 
 ✅ E2E test suite ready for CI/CD integration!
+
 ```
 
 ## Test Artifacts
@@ -254,6 +257,7 @@ Quarantine recommendation: Mark as test.fixme() until fixed
 ## Browser Configuration
 
 Tests run on multiple browsers by default:
+
 - ✅ Chromium (Desktop Chrome)
 - ✅ Firefox (Desktop)
 - ✅ WebKit (Desktop Safari)
@@ -286,6 +290,7 @@ Add to your CI pipeline:
 For PMX, prioritize these E2E tests:
 
 **🔴 CRITICAL (Must Always Pass):**
+
 1. User can connect wallet
 2. User can browse markets
 3. User can search markets (semantic search)
@@ -295,6 +300,7 @@ For PMX, prioritize these E2E tests:
 7. User can withdraw funds
 
 **🟡 IMPORTANT:**
+
 1. Market creation flow
 2. User profile updates
 3. Real-time price updates
@@ -305,6 +311,7 @@ For PMX, prioritize these E2E tests:
 ## Best Practices
 
 **DO:**
+
 - ✅ Use Page Object Model for maintainability
 - ✅ Use data-testid attributes for selectors
 - ✅ Wait for API responses, not arbitrary timeouts
@@ -313,6 +320,7 @@ For PMX, prioritize these E2E tests:
 - ✅ Review artifacts when tests fail
 
 **DON'T:**
+
 - ❌ Use brittle selectors (CSS classes can change)
 - ❌ Test implementation details
 - ❌ Run tests against production
@@ -323,6 +331,7 @@ For PMX, prioritize these E2E tests:
 ## Important Notes
 
 **CRITICAL for PMX:**
+
 - E2E tests involving real money MUST run on testnet/staging only
 - Never run trading tests against production
 - Set `test.skip(process.env.NODE_ENV === 'production')` for financial tests

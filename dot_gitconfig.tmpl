@@ -12,11 +12,15 @@
 	prune = fetch --prune
 	pm = pull origin master
 	sw = switch
+	wt = worktree
 [init]
 	defaultBranch = main
 [core]
 	autocrlf = input
 	ignorecase = false
+	editor = vim
+[pull]
+	rebase = false
 
 {{ if eq .chezmoi.os "darwin" }}
 # macOSの場合

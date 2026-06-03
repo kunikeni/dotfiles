@@ -1,6 +1,6 @@
 ---
 name: strategic-compact
-description: Suggests manual context compaction at logical intervals to preserve context through task phases rather than arbitrary auto-compaction.
+description: 任意の自動コンパクション ではなく、タスク フェーズ全体でコンテキストを保持するための論理的な間隔での手動コンテキスト コンパクションを提案。
 ---
 
 # Strategic Compact Skill
@@ -10,11 +10,13 @@ Suggests manual `/compact` at strategic points in your workflow rather than rely
 ## Why Strategic Compaction?
 
 Auto-compaction triggers at arbitrary points:
+
 - Often mid-task, losing important context
 - No awareness of logical task boundaries
 - Can interrupt complex multi-step operations
 
 Strategic compaction at logical boundaries:
+
 - **After exploration, before execution** - Compact research context, keep implementation plan
 - **After completing a milestone** - Fresh start for next phase
 - **Before major context shifts** - Clear exploration context before different task
@@ -48,6 +50,7 @@ Add to your `~/.claude/settings.json`:
 ## Configuration
 
 Environment variables:
+
 - `COMPACT_THRESHOLD` - Tool calls before first suggestion (default: 50)
 
 ## Best Practices

@@ -1,3 +1,8 @@
+---
+name: test-coverage
+description: テスト カバレッジを分析し、不足しているテストを生成。80% のしきい値以下のファイルをカバーするテストを追加。
+---
+
 # Test Coverage
 
 Analyze test coverage and generate missing tests:
@@ -21,6 +26,7 @@ Analyze test coverage and generate missing tests:
 7. Ensure project reaches 80%+ overall coverage
 
 Focus on:
+
 - Happy path scenarios
 - Error handling
 - Edge cases (null, undefined, empty)

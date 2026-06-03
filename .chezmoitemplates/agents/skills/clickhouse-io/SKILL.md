@@ -1,6 +1,6 @@
 ---
 name: clickhouse-io
-description: ClickHouse database patterns, query optimization, analytics, and data engineering best practices for high-performance analytical workloads.
+description: ClickHouse データベース設計、SQL クエリ最適化、分析パターン、高性能 OLAP ワークロード向けデータエンジニアリング ベストプラクティス。Python クライアント実装例含む。
 ---
 
 # ClickHouse Analytics Patterns
@@ -12,6 +12,7 @@ ClickHouse-specific patterns for high-performance analytics and data engineering
 ClickHouse is a column-oriented database management system (DBMS) for online analytical processing (OLAP). It's optimized for fast analytical queries on large datasets.
 
 **Key Features:**
+
 - Column-oriented storage
 - Data compression
 - Parallel query execution
@@ -150,59 +151,95 @@ ORDER BY market_id, date;
 
 ### Bulk Insert (Recommended)
 
-```typescript
-import { ClickHouse } from 'clickhouse'
+```python
+from clickhouse_driver import Client
+from datetime import datetime
+import os
 
-const clickhouse = new ClickHouse({
-  url: process.env.CLICKHOUSE_URL,
-  port: 8123,
-  basicAuth: {
-    username: process.env.CLICKHOUSE_USER,
-    password: process.env.CLICKHOUSE_PASSWORD
-  }
-})
+# Connect to ClickHouse
+client = Client(
+    host=os.getenv('CLICKHOUSE_HOST', 'localhost'),
+    port=int(os.getenv('CLICKHOUSE_PORT', 9000)),
+    user=os.getenv('CLICKHOUSE_USER', 'default'),
+    password=os.getenv('CLICKHOUSE_PASSWORD', ''),
+    settings={'use_numpy': True}
+)
 
-// ✅ Batch insert (efficient)
-async function bulkInsertTrades(trades: Trade[]) {
-  const values = trades.map(trade => `(
-    '${trade.id}',
-    '${trade.market_id}',
-    '${trade.user_id}',
-    ${trade.amount},
-    '${trade.timestamp.toISOString()}'
-  )`).join(',')
+# ✅ Batch insert (efficient)
+async def bulk_insert_trades(trades: list[dict]) -> None:
+    """Insert trades in batch for efficiency."""
+    values = [
+        (
+            trade['id'],
+            trade['market_id'],
+            trade['user_id'],
+            float(trade['amount']),
+            trade['timestamp']
+        )
+        for trade in trades
+    ]
 
-  await clickhouse.query(`
-    INSERT INTO trades (id, market_id, user_id, amount, timestamp)
-    VALUES ${values}
-  `).toPromise()
-}
+    client.execute(
+        'INSERT INTO trades (id, market_id, user_id, amount, timestamp) VALUES',
+        values
+    )
 
-// ❌ Individual inserts (slow)
-async function insertTrade(trade: Trade) {
-  // Don't do this in a loop!
-  await clickhouse.query(`
-    INSERT INTO trades VALUES ('${trade.id}', ...)
-  `).toPromise()
-}
+# ❌ Individual inserts (slow)
+async def insert_trade(trade: dict) -> None:
+    """Don't do this in a loop! Very inefficient."""
+    client.execute(
+        'INSERT INTO trades (id, market_id, user_id, amount, timestamp) VALUES',
+        [(
+            trade['id'],
+            trade['market_id'],
+            trade['user_id'],
+            float(trade['amount']),
+            trade['timestamp']
+        )]
+    )
 ```
 
-### Streaming Insert
+### Streaming Insert with AsyncIO
 
-```typescript
-// For continuous data ingestion
-import { createWriteStream } from 'fs'
-import { pipeline } from 'stream/promises'
+```python
+from clickhouse_driver import Client
+import asyncio
+from collections.abc import AsyncIterator
+import logging
 
-async function streamInserts() {
-  const stream = clickhouse.insert('trades').stream()
+logger = logging.getLogger(__name__)
 
-  for await (const batch of dataSource) {
-    stream.write(batch)
-  }
+async def stream_inserts(data_source: AsyncIterator[list[dict]]) -> None:
+    """Stream data inserts for continuous data ingestion."""
+    client = Client(
+        host=os.getenv('CLICKHOUSE_HOST', 'localhost'),
+        port=int(os.getenv('CLICKHOUSE_PORT', 9000)),
+    )
 
-  await stream.end()
-}
+    try:
+        async for batch in data_source:
+            values = [
+                (
+                    item['id'],
+                    item['market_id'],
+                    item['user_id'],
+                    float(item['amount']),
+                    item['timestamp']
+                )
+                for item in batch
+            ]
+
+            client.execute(
+                'INSERT INTO trades (id, market_id, user_id, amount, timestamp) VALUES',
+                values
+            )
+            logger.info(f'Inserted {len(batch)} records')
+
+    except Exception as e:
+        logger.error(f'Stream insert failed: {e}')
+        raise
+    finally:
+        client.disconnect()
 ```
 
 ## Materialized Views
@@ -351,76 +388,149 @@ ORDER BY cohort, months_since_signup;
 
 ### ETL Pattern
 
-```typescript
-// Extract, Transform, Load
-async function etlPipeline() {
-  // 1. Extract from source
-  const rawData = await extractFromPostgres()
+```python
+import asyncio
+import logging
+from datetime import datetime
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 
-  // 2. Transform
-  const transformed = rawData.map(row => ({
-    date: new Date(row.created_at).toISOString().split('T')[0],
-    market_id: row.market_slug,
-    volume: parseFloat(row.total_volume),
-    trades: parseInt(row.trade_count)
-  }))
+logger = logging.getLogger(__name__)
 
-  // 3. Load to ClickHouse
-  await bulkInsertToClickHouse(transformed)
-}
+async def extract_from_postgres(session: AsyncSession) -> list[dict]:
+    """Extract data from PostgreSQL."""
+    stmt = select(MarketStats).limit(1000)
+    result = await session.execute(stmt)
+    rows = result.scalars().all()
+    return [row.dict() for row in rows]
 
-// Run periodically
-setInterval(etlPipeline, 60 * 60 * 1000)  // Every hour
+async def transform_data(raw_data: list[dict]) -> list[dict]:
+    """Transform data for ClickHouse."""
+    return [
+        {
+            'date': datetime.fromisoformat(row['created_at']).date(),
+            'market_id': row['market_slug'],
+            'volume': float(row['total_volume']),
+            'trades': int(row['trade_count'])
+        }
+        for row in raw_data
+    ]
+
+async def etl_pipeline(session: AsyncSession, client) -> None:
+    """Extract, Transform, Load pipeline."""
+    try:
+        # 1. Extract from source
+        raw_data = await extract_from_postgres(session)
+
+        # 2. Transform
+        transformed = await transform_data(raw_data)
+
+        # 3. Load to ClickHouse
+        values = [
+            (row['date'], row['market_id'], row['volume'], row['trades'])
+            for row in transformed
+        ]
+        client.execute(
+            'INSERT INTO market_analytics (date, market_id, volume, trades) VALUES',
+            values
+        )
+        logger.info(f'ETL complete: loaded {len(values)} records')
+
+    except Exception as e:
+        logger.error(f'ETL pipeline failed: {e}')
+        raise
+
+# Run periodically (every hour)
+async def run_scheduled_etl(session: AsyncSession, client) -> None:
+    """Run ETL pipeline every hour."""
+    while True:
+        await etl_pipeline(session, client)
+        await asyncio.sleep(3600)  # 1 hour
 ```
 
 ### Change Data Capture (CDC)
 
-```typescript
-// Listen to PostgreSQL changes and sync to ClickHouse
-import { Client } from 'pg'
+```python
+import asyncio
+import json
+import logging
+import psycopg
+from datetime import datetime
+from clickhouse_driver import Client
 
-const pgClient = new Client({ connectionString: process.env.DATABASE_URL })
+logger = logging.getLogger(__name__)
 
-pgClient.query('LISTEN market_updates')
+async def listen_postgres_changes(conn_string: str, clickhouse_client: Client) -> None:
+    """Listen to PostgreSQL changes and sync to ClickHouse."""
+    async with await psycopg.AsyncConnection.connect(conn_string) as conn:
+        async with conn.cursor() as cur:
+            # Subscribe to notifications
+            await cur.execute('LISTEN market_updates')
+            logger.info('Listening to market_updates channel')
 
-pgClient.on('notification', async (msg) => {
-  const update = JSON.parse(msg.payload)
+            async for notify in conn.notifies():
+                try:
+                    update = json.loads(notify.payload)
 
-  await clickhouse.insert('market_updates', [
-    {
-      market_id: update.id,
-      event_type: update.operation,  // INSERT, UPDATE, DELETE
-      timestamp: new Date(),
-      data: JSON.stringify(update.new_data)
-    }
-  ])
-})
+                    # Insert into ClickHouse market_updates table
+                    values = [(
+                        update['id'],                  # market_id
+                        update['operation'],           # INSERT, UPDATE, DELETE
+                        datetime.now(),               # timestamp
+                        json.dumps(update['new_data']) # data
+                    )]
+
+                    clickhouse_client.execute(
+                        'INSERT INTO market_updates (market_id, event_type, timestamp, data) VALUES',
+                        values
+                    )
+                    logger.info(f'Synced {update["operation"]} for market {update["id"]}')
+
+                except Exception as e:
+                    logger.error(f'CDC sync failed: {e}')
+                    continue
+
+# Usage
+async def start_cdc_sync(postgres_url: str, clickhouse_client: Client) -> None:
+    """Start CDC listener."""
+    try:
+        await listen_postgres_changes(postgres_url, clickhouse_client)
+    except asyncio.CancelledError:
+        logger.info('CDC sync stopped')
+    except Exception as e:
+        logger.error(f'CDC sync error: {e}')
+        raise
 ```
 
 ## Best Practices
 
 ### 1. Partitioning Strategy
+
 - Partition by time (usually month or day)
 - Avoid too many partitions (performance impact)
 - Use DATE type for partition key
 
 ### 2. Ordering Key
+
 - Put most frequently filtered columns first
 - Consider cardinality (high cardinality first)
 - Order impacts compression
 
 ### 3. Data Types
+
 - Use smallest appropriate type (UInt32 vs UInt64)
 - Use LowCardinality for repeated strings
 - Use Enum for categorical data
 
 ### 4. Avoid
+
 - SELECT * (specify columns)
 - FINAL (merge data before query instead)
 - Too many JOINs (denormalize for analytics)
 - Small frequent inserts (batch instead)
 
 ### 5. Monitoring
+
 - Track query performance
 - Monitor disk usage
 - Check merge operations

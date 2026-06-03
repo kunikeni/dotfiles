@@ -1,14 +1,20 @@
+---
+name: project-guidelines-example
+description: プロジェクト固有スキルの例。FastAPI + Python バックエンド向けテンプレート。独自プロジェクト用にカスタマイズしてください。
+---
+
 # Project Guidelines Skill (Example)
 
-This is an example of a project-specific skill. Use this as a template for your own projects.
+This is an example of a project-specific skill for Python + FastAPI backend. Use this as a template for your own projects.
 
-Based on a real production application: [Zenith](https://zenith.chat) - AI-powered customer discovery platform.
+Based on a real production application architecture.
 
 ---
 
 ## When to Use
 
 Reference this skill when working on the specific project it's designed for. Project skills contain:
+
 - Architecture overview
 - File structure
 - Code patterns
@@ -20,34 +26,32 @@ Reference this skill when working on the specific project it's designed for. Pro
 ## Architecture Overview
 
 **Tech Stack:**
-- **Frontend**: Next.js 15 (App Router), TypeScript, React
-- **Backend**: FastAPI (Python), Pydantic models
-- **Database**: Supabase (PostgreSQL)
-- **AI**: Claude API with tool calling and structured output
-- **Deployment**: Google Cloud Run
-- **Testing**: Playwright (E2E), pytest (backend), React Testing Library
 
-**Services:**
+- **Backend**: FastAPI (Python 3.12+), Pydantic models, SQLAlchemy
+- **Database**: PostgreSQL via AWS RDS
+- **AI**: Claude API with tool calling and structured output
+- **Cache**: Redis via AWS ElastiCache
+- **Async**: asyncio + httpx
+- **Testing**: pytest + pytest-asyncio
+- **Deployment**: AWS ECS on Fargate
+- **Container Registry**: AWS ECR
+- **Package Manager**: Poetry
+
+**Services Architecture:**
+
 ```
-┌─────────────────────────────────────────────────────────────┐
-│                         Frontend                            │
-│  Next.js 15 + TypeScript + TailwindCSS                     │
-│  Deployed: Vercel / Cloud Run                              │
-└─────────────────────────────────────────────────────────────┘
-                              │
-                              ▼
-┌─────────────────────────────────────────────────────────────┐
-│                         Backend                             │
-│  FastAPI + Python 3.11 + Pydantic                          │
-│  Deployed: Cloud Run                                       │
-└─────────────────────────────────────────────────────────────┘
-                              │
-              ┌───────────────┼───────────────┐
-              ▼               ▼               ▼
-        ┌──────────┐   ┌──────────┐   ┌──────────┐
-        │ Supabase │   │  Claude  │   │  Redis   │
-        │ Database │   │   API    │   │  Cache   │
-        └──────────┘   └──────────┘   └──────────┘
+┌────────────────────────────────────────────────────┐
+│              FastAPI Application                   │
+│  Python 3.12+ + Pydantic + SQLAlchemy              │
+│  Deployed: AWS ECS Fargate                         │
+└────────────────────────────────────────────────────┘
+                       │
+        ┌──────────────┼──────────────┐
+        ▼              ▼              ▼
+    ┌─────────┐  ┌─────────┐  ┌─────────┐
+    │ RDS     │  │ Claude  │  │ElastiCache
+    │PostgreSQL  API     │  Redis   │
+    └─────────┘  └─────────┘  └─────────┘
 ```
 
 ---
@@ -56,92 +60,116 @@ Reference this skill when working on the specific project it's designed for. Pro
 
 ```
 project/
-├── frontend/
-│   └── src/
-│       ├── app/              # Next.js app router pages
-│       │   ├── api/          # API routes
-│       │   ├── (auth)/       # Auth-protected routes
-│       │   └── workspace/    # Main app workspace
-│       ├── components/       # React components
-│       │   ├── ui/           # Base UI components
-│       │   ├── forms/        # Form components
-│       │   └── layouts/      # Layout components
-│       ├── hooks/            # Custom React hooks
-│       ├── lib/              # Utilities
-│       ├── types/            # TypeScript definitions
-│       └── config/           # Configuration
-│
-├── backend/
-│   ├── routers/              # FastAPI route handlers
-│   ├── models.py             # Pydantic models
-│   ├── main.py               # FastAPI app entry
-│   ├── auth_system.py        # Authentication
-│   ├── database.py           # Database operations
-│   ├── services/             # Business logic
-│   └── tests/                # pytest tests
-│
-├── deploy/                   # Deployment configs
-├── docs/                     # Documentation
-└── scripts/                  # Utility scripts
+├── pyproject.toml                  # Poetry config
+├── poetry.lock                     # Locked dependencies
+├── .env.example                    # Environment template
+├── .env.local                      # Local development (gitignored)
+├── src/
+│   ├── __init__.py
+│   ├── main.py                     # FastAPI app entry
+│   ├── config.py                   # Settings/configuration
+│   ├── app/
+│   │   ├── __init__.py
+│   │   ├── api/                    # API routes
+│   │   │   ├── __init__.py
+│   │   │   ├── market_router.py    # Market endpoints
+│   │   │   └── serializer/         # Request/response models
+│   │   │       ├── __init__.py
+│   │   │       └── market_serializer.py
+│   │   ├── usecase/                # Business logic
+│   │   │   ├── __init__.py
+│   │   │   └── market_use_case.py
+│   │   ├── domain/                 # Domain logic
+│   │   │   ├── __init__.py
+│   │   │   ├── entity/             # Entity definitions
+│   │   │   ├── service/            # Domain services
+│   │   │   └── interface/          # ABC/protocols
+│   │   └── infrastructure/         # DB, external APIs
+│   │       ├── __init__.py
+│   │       ├── models/             # SQLAlchemy models
+│   │       ├── repository/         # DB operations
+│   │       └── provider/           # External API clients
+│   └── common/
+│       ├── __init__.py
+│       ├── exception.py            # Custom exceptions
+│       └── logger.py               # Logging setup
+├── tests/
+│   ├── __init__.py
+│   ├── conftest.py                 # pytest fixtures
+│   ├── unit/                       # Unit tests
+│   ├── integration/                # Integration tests
+│   └── e2e/                        # End-to-end tests
+└── docs/
+    ├── README.md
+    └── API.md
 ```
 
 ---
 
 ## Code Patterns
 
-### API Response Format (FastAPI)
+### API Response Format (FastAPI + Pydantic)
 
 ```python
 from pydantic import BaseModel
-from typing import Generic, TypeVar, Optional
 
-T = TypeVar('T')
-
-class ApiResponse(BaseModel, Generic[T]):
+class ApiResponse[T](BaseModel):
+    """Standard API response wrapper."""
     success: bool
-    data: Optional[T] = None
-    error: Optional[str] = None
+    data: T | None = None
+    error: str | None = None
+    meta: dict | None = None
 
     @classmethod
-    def ok(cls, data: T) -> "ApiResponse[T]":
-        return cls(success=True, data=data)
+    def ok(cls, data: T, meta: dict | None = None) -> "ApiResponse[T]":
+        """Create success response."""
+        return cls(success=True, data=data, meta=meta)
 
     @classmethod
     def fail(cls, error: str) -> "ApiResponse[T]":
+        """Create error response."""
         return cls(success=False, error=error)
 ```
 
-### Frontend API Calls (TypeScript)
+### FastAPI Endpoint Pattern
 
-```typescript
-interface ApiResponse<T> {
-  success: boolean
-  data?: T
-  error?: string
-}
+```python
+from fastapi import APIRouter, Depends, HTTPException, status
+from sqlalchemy.ext.asyncio import AsyncSession
+from app.usecase.market_use_case import MarketUseCase
+from app.api.serializer.market_serializer import (
+    CreateMarketRequest,
+    MarketResponse
+)
 
-async function fetchApi<T>(
-  endpoint: string,
-  options?: RequestInit
-): Promise<ApiResponse<T>> {
-  try {
-    const response = await fetch(`/api${endpoint}`, {
-      ...options,
-      headers: {
-        'Content-Type': 'application/json',
-        ...options?.headers,
-      },
-    })
+router = APIRouter(prefix="/markets", tags=["markets"])
 
-    if (!response.ok) {
-      return { success: false, error: `HTTP ${response.status}` }
-    }
+@router.post("/", response_model=MarketResponse, status_code=status.HTTP_201_CREATED)
+async def create_market(
+    request: CreateMarketRequest,
+    session: AsyncSession = Depends(get_session)
+) -> MarketResponse:
+    """Create a new market."""
+    use_case = MarketUseCase(session)
+    market = await use_case.create_market(request)
+    return MarketResponse.from_entity(market)
 
-    return await response.json()
-  } catch (error) {
-    return { success: false, error: String(error) }
-  }
-}
+@router.get("/{market_id}", response_model=MarketResponse)
+async def get_market(
+    market_id: str,
+    session: AsyncSession = Depends(get_session)
+) -> MarketResponse:
+    """Get market details."""
+    use_case = MarketUseCase(session)
+    market = await use_case.get_market(market_id)
+
+    if not market:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Market {market_id} not found"
+        )
+
+    return MarketResponse.from_entity(market)
 ```
 
 ### Claude AI Integration (Structured Output)
@@ -151,15 +179,17 @@ from anthropic import Anthropic
 from pydantic import BaseModel
 
 class AnalysisResult(BaseModel):
+    """Structured analysis output."""
     summary: str
     key_points: list[str]
     confidence: float
 
 async def analyze_with_claude(content: str) -> AnalysisResult:
+    """Analyze content using Claude with structured output."""
     client = Anthropic()
 
     response = client.messages.create(
-        model="claude-sonnet-4-5-20250514",
+        model="claude-opus-4-5-20250514",
         max_tokens=1024,
         messages=[{"role": "user", "content": content}],
         tools=[{
@@ -179,40 +209,56 @@ async def analyze_with_claude(content: str) -> AnalysisResult:
     return AnalysisResult(**tool_use.input)
 ```
 
-### Custom Hooks (React)
+### Repository Pattern (SQLAlchemy)
 
-```typescript
-import { useState, useCallback } from 'react'
+```python
+from abc import ABC, abstractmethod
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
 
-interface UseApiState<T> {
-  data: T | null
-  loading: boolean
-  error: string | null
-}
+class MarketRepository(ABC):
+    """Market data access interface."""
 
-export function useApi<T>(
-  fetchFn: () => Promise<ApiResponse<T>>
-) {
-  const [state, setState] = useState<UseApiState<T>>({
-    data: null,
-    loading: false,
-    error: null,
-  })
+    @abstractmethod
+    async def find_by_id(self, market_id: str) -> 'Market' | None:
+        pass
 
-  const execute = useCallback(async () => {
-    setState(prev => ({ ...prev, loading: true, error: null }))
+    @abstractmethod
+    async def find_all(self, limit: int = 10) -> list['Market']:
+        pass
 
-    const result = await fetchFn()
+    @abstractmethod
+    async def create(self, data: CreateMarketRequest) -> 'Market':
+        pass
 
-    if (result.success) {
-      setState({ data: result.data!, loading: false, error: null })
-    } else {
-      setState({ data: null, loading: false, error: result.error! })
-    }
-  }, [fetchFn])
+class MarketRepositoryImpl(MarketRepository):
+    """SQLAlchemy implementation."""
 
-  return { ...state, execute }
-}
+    def __init__(self, session: AsyncSession):
+        self.session = session
+
+    async def find_by_id(self, market_id: str) -> Market | None:
+        """Fetch market by ID."""
+        stmt = select(Market).where(Market.id == market_id)
+        result = await self.session.execute(stmt)
+        return result.scalars().first()
+
+    async def find_all(self, limit: int = 10) -> list[Market]:
+        """Fetch all markets."""
+        stmt = select(Market).limit(limit)
+        result = await self.session.execute(stmt)
+        return result.scalars().all()
+
+    async def create(self, data: CreateMarketRequest) -> Market:
+        """Create new market."""
+        market = Market(
+            name=data.name,
+            description=data.description,
+            end_date=data.end_date
+        )
+        self.session.add(market)
+        await self.session.flush()
+        return market
 ```
 
 ---
@@ -226,60 +272,61 @@ export function useApi<T>(
 poetry run pytest tests/
 
 # Run with coverage
-poetry run pytest tests/ --cov=. --cov-report=html
+poetry run pytest tests/ --cov=src --cov-report=html
 
 # Run specific test file
-poetry run pytest tests/test_auth.py -v
+poetry run pytest tests/unit/test_market_service.py -v
+
+# Watch mode
+poetry run pytest tests/ --watch
 ```
 
-**Test structure:**
+**Test structure (pytest + asyncio):**
+
 ```python
 import pytest
 from httpx import AsyncClient
-from main import app
+from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
+from src.main import app
+
+@pytest.fixture
+async def db_session():
+    """Provide async database session for tests."""
+    engine = create_async_engine("sqlite+aiosqlite:///:memory:")
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.create_all)
+
+    async with AsyncSession(engine) as session:
+        yield session
 
 @pytest.fixture
 async def client():
+    """Provide async test client."""
     async with AsyncClient(app=app, base_url="http://test") as ac:
         yield ac
 
 @pytest.mark.asyncio
-async def test_health_check(client: AsyncClient):
-    response = await client.get("/health")
-    assert response.status_code == 200
-    assert response.json()["status"] == "healthy"
-```
+async def test_create_market(client: AsyncClient):
+    """Test market creation."""
+    response = await client.post(
+        "/markets/",
+        json={
+            "name": "Test Market",
+            "description": "A test market",
+            "end_date": "2025-12-31"
+        }
+    )
 
-### Frontend (React Testing Library)
+    assert response.status_code == 201
+    data = response.json()
+    assert data["success"] is True
+    assert data["data"]["name"] == "Test Market"
 
-```bash
-# Run tests
-npm run test
-
-# Run with coverage
-npm run test -- --coverage
-
-# Run E2E tests
-npm run test:e2e
-```
-
-**Test structure:**
-```typescript
-import { render, screen, fireEvent } from '@testing-library/react'
-import { WorkspacePanel } from './WorkspacePanel'
-
-describe('WorkspacePanel', () => {
-  it('renders workspace correctly', () => {
-    render(<WorkspacePanel />)
-    expect(screen.getByRole('main')).toBeInTheDocument()
-  })
-
-  it('handles session creation', async () => {
-    render(<WorkspacePanel />)
-    fireEvent.click(screen.getByText('New Session'))
-    expect(await screen.findByText('Session created')).toBeInTheDocument()
-  })
-})
+@pytest.mark.asyncio
+async def test_get_market_not_found(client: AsyncClient):
+    """Test getting non-existent market."""
+    response = await client.get("/markets/nonexistent")
+    assert response.status_code == 404
 ```
 
 ---
@@ -288,38 +335,201 @@ describe('WorkspacePanel', () => {
 
 ### Pre-Deployment Checklist
 
-- [ ] All tests passing locally
-- [ ] `npm run build` succeeds (frontend)
-- [ ] `poetry run pytest` passes (backend)
+- [ ] All tests passing: `poetry run pytest tests/ --cov=src`
+- [ ] Type checking passing: `poetry run mypy src/`
+- [ ] Linting passing: `poetry run ruff check src/`
+- [ ] Code formatting: `poetry run black src/`
 - [ ] No hardcoded secrets
-- [ ] Environment variables documented
-- [ ] Database migrations ready
+- [ ] Environment variables documented in `.env.example`
+- [ ] Database migrations up to date
+- [ ] Dependencies updated: `poetry update`
 
 ### Deployment Commands
 
 ```bash
-# Build and deploy frontend
-cd frontend && npm run build
-gcloud run deploy frontend --source .
+# Set AWS variables
+export AWS_ACCOUNT_ID=123456789012
+export AWS_REGION=us-east-1
+export ECR_REPOSITORY=project-backend
+export SERVICE_NAME=project-backend
+export CLUSTER_NAME=project-cluster
 
-# Build and deploy backend
-cd backend
-gcloud run deploy backend --source .
+# Build container image
+docker build -t project-backend:latest .
+
+# Tag image for ECR
+docker tag project-backend:latest \
+  $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPOSITORY:latest
+
+# Login to ECR
+aws ecr get-login-password --region $AWS_REGION | \
+  docker login --username AWS --password-stdin \
+  $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com
+
+# Push to ECR
+docker push \
+  $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPOSITORY:latest
+
+# Deploy to ECS Fargate
+aws ecs update-service \
+  --cluster $CLUSTER_NAME \
+  --service $SERVICE_NAME \
+  --region $AWS_REGION \
+  --force-new-deployment
+```
+
+### Dockerfile (Fargate Optimized)
+
+```dockerfile
+FROM python:3.12-slim
+
+WORKDIR /app
+
+# Install dependencies
+RUN pip install --no-cache-dir poetry
+
+# Copy poetry files
+COPY pyproject.toml poetry.lock ./
+
+# Install dependencies
+RUN poetry install --no-dev --no-interaction --no-ansi
+
+# Copy source code
+COPY src/ src/
+
+# Expose port
+EXPOSE 8000
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+  CMD python -c "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')" || exit 1
+
+# Run FastAPI with Uvicorn
+CMD ["poetry", "run", "uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "8000"]
+```
+
+### ECS Task Definition (JSON)
+
+```json
+{
+  "family": "project-backend",
+  "networkMode": "awsvpc",
+  "requiresCompatibilities": ["FARGATE"],
+  "cpu": "256",
+  "memory": "512",
+  "containerDefinitions": [
+    {
+      "name": "project-backend",
+      "image": "123456789012.dkr.ecr.us-east-1.amazonaws.com/project-backend:latest",
+      "portMappings": [
+        {
+          "containerPort": 8000,
+          "hostPort": 8000,
+          "protocol": "tcp"
+        }
+      ],
+      "environment": [
+        {
+          "name": "ENVIRONMENT",
+          "value": "production"
+        },
+        {
+          "name": "LOG_LEVEL",
+          "value": "INFO"
+        }
+      ],
+      "secrets": [
+        {
+          "name": "DATABASE_URL",
+          "valueFrom": "arn:aws:secretsmanager:us-east-1:123456789012:secret:project/db-url"
+        },
+        {
+          "name": "ANTHROPIC_API_KEY",
+          "valueFrom": "arn:aws:secretsmanager:us-east-1:123456789012:secret:project/anthropic-key"
+        },
+        {
+          "name": "REDIS_URL",
+          "valueFrom": "arn:aws:secretsmanager:us-east-1:123456789012:secret:project/redis-url"
+        }
+      ],
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/ecs/project-backend",
+          "awslogs-region": "us-east-1",
+          "awslogs-stream-prefix": "ecs"
+        }
+      },
+      "healthCheck": {
+        "command": ["CMD-SHELL", "curl -f http://localhost:8000/health || exit 1"],
+        "interval": 30,
+        "timeout": 5,
+        "retries": 3,
+        "startPeriod": 10
+      }
+    }
+  ],
+  "executionRoleArn": "arn:aws:iam::123456789012:role/ecsTaskExecutionRole",
+  "taskRoleArn": "arn:aws:iam::123456789012:role/ecsTaskRole"
+}
 ```
 
 ### Environment Variables
 
 ```bash
-# Frontend (.env.local)
-NEXT_PUBLIC_API_URL=https://api.example.com
-NEXT_PUBLIC_SUPABASE_URL=https://xxx.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJ...
-
-# Backend (.env)
-DATABASE_URL=postgresql://...
+# .env for local development
+DATABASE_URL=postgresql://user:password@localhost/db_name
 ANTHROPIC_API_KEY=sk-ant-...
-SUPABASE_URL=https://xxx.supabase.co
-SUPABASE_KEY=eyJ...
+REDIS_URL=redis://localhost:6379
+LOG_LEVEL=INFO
+ENVIRONMENT=development
+
+# Production (stored in AWS Secrets Manager)
+# Retrieve with:
+# aws secretsmanager get-secret-value --secret-id project/db-url --region us-east-1
+# aws secretsmanager get-secret-value --secret-id project/anthropic-key --region us-east-1
+# aws secretsmanager get-secret-value --secret-id project/redis-url --region us-east-1
+
+DATABASE_URL=postgresql://prod-user:***@project-db.c9akciq32.us-east-1.rds.amazonaws.com:5432/production
+ANTHROPIC_API_KEY=***
+REDIS_URL=redis://project-redis.abc123.ng.0001.use1.cache.amazonaws.com:6379
+ENVIRONMENT=production
+LOG_LEVEL=INFO
+```
+
+### AWS Infrastructure Setup
+
+```bash
+# Create ECR repository
+aws ecr create-repository \
+  --repository-name project-backend \
+  --region us-east-1
+
+# Create ECS cluster
+aws ecs create-cluster \
+  --cluster-name project-cluster \
+  --region us-east-1
+
+# Create CloudWatch log group
+aws logs create-log-group \
+  --log-group-name /ecs/project-backend \
+  --region us-east-1
+
+# Register task definition
+aws ecs register-task-definition \
+  --cli-input-json file://task-definition.json \
+  --region us-east-1
+
+# Create ECS service
+aws ecs create-service \
+  --cluster project-cluster \
+  --service-name project-backend \
+  --task-definition project-backend:1 \
+  --desired-count 2 \
+  --launch-type FARGATE \
+  --network-configuration "awsvpcConfiguration={subnets=[subnet-xxx,subnet-yyy],securityGroups=[sg-xxx],assignPublicIp=ENABLED}" \
+  --load-balancers targetGroupArn=arn:aws:elasticloadbalancing:us-east-1:123456789012:targetgroup/project-backend/xxx,containerName=project-backend,containerPort=8000 \
+  --region us-east-1
 ```
 
 ---
@@ -327,19 +537,35 @@ SUPABASE_KEY=eyJ...
 ## Critical Rules
 
 1. **No emojis** in code, comments, or documentation
-2. **Immutability** - never mutate objects or arrays
-3. **TDD** - write tests before implementation
-4. **80% coverage** minimum
-5. **Many small files** - 200-400 lines typical, 800 max
-6. **No console.log** in production code
-7. **Proper error handling** with try/catch
-8. **Input validation** with Pydantic/Zod
+2. **Immutability** - never mutate objects or collections
+3. **Type hints** - all functions require type hints
+4. **TDD** - write tests before implementation
+5. **80% coverage** minimum for all code
+6. **Small files** - 200-400 lines typical, 800 max
+7. **No logging statements** - use proper logging module
+8. **Input validation** - use Pydantic for all inputs
+9. **Error handling** - comprehensive try/catch with logging
+10. **No hardcoded values** - use config/environment
+
+---
+
+## Quality Gates
+
+```bash
+# Run all checks before commit
+poetry run black src/ tests/
+poetry run ruff check --fix src/ tests/
+poetry run mypy src/
+poetry run pytest tests/ --cov=src --cov-report=term-missing
+
+# All must pass!
+```
 
 ---
 
 ## Related Skills
 
-- `coding-standards.md` - General coding best practices
-- `backend-patterns.md` - API and database patterns
-- `frontend-patterns.md` - React and Next.js patterns
-- `tdd-workflow/` - Test-driven development methodology
+- `coding-standards.md` - Python 3.12+ coding standards
+- `backend-patterns.md` - FastAPI + clean architecture patterns
+- `tdd-workflow.md` - pytest test-driven development
+- `security-review.md` - Security checklist for APIs
