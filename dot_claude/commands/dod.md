@@ -43,11 +43,21 @@ uv run make type-check
 # プロジェクトに合わせてコマンドを読み替えること
 ```
 
+Terraform プロジェクトの場合は、以下を順番に実行する。`terraform plan` まで DoD に含め、想定外の差分（特に delete/replace）がないか目視確認すること。
+
+```bash
+cd terraform/ && terraform fmt -recursive
+tflint --config $(pwd)/.tflint.hcl --recursive
+cd env/{target}/ && terraform validate
+cd env/{target}/ && terraform plan
+```
+
 ### 3. 判定基準
 
 - **全項目エラーゼロ** であること
 - **プロジェクト全体** を対象に検証していること（変更箇所のみは不可）
 - 特定ファイルやディレクトリに限定した実行は不可
+- Terraform の場合は `terraform plan` の差分を読み、意図しない削除・再作成がないことを確認していること
 
 ### 4. レポート出力
 

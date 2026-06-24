@@ -93,7 +93,7 @@ uv run pytest          # NG — use uv run task test for DoD
 |----------|----------|
 | All (common) | lint, format, test |
 | Python | `uv run task lint` / `uv run task format` / `uv run task type-check` / `uv run task test` |
-| Terraform | `terraform fmt -recursive` / `terraform validate` / `tflint --config $(pwd)/.tflint.hcl --recursive` |
+| Terraform | `terraform fmt -recursive` / `terraform validate` / `tflint --config $(pwd)/.tflint.hcl --recursive` / `terraform plan` |
 
 **DoD Execution Rules (CRITICAL):**
 

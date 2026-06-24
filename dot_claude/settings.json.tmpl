@@ -59,7 +59,7 @@
     "defaultMode": "default"
   },
   "awsAuthRefresh": "aws sso login --sso-session {{ .SSO_SESSION_NAME }}"
-  "model": "us.anthropic.claude-opus-4-8",
+  "model": {{ .claude_model | quote }},
   "statusLine": {
     "type": "command",
     "command": "input=$(cat); cwd=$(pwd); user=$(whoami); host=$(hostname -s); git_info=\"\"; [ -d .git ] && git_branch=$(git branch --show-current 2>/dev/null) && [ -n \"$git_branch\" ] && git_info=\" ($git_branch)\"; model_id=$(echo \"$input\" | jq -r '.model.id // empty'); model_info=\"\"; if [ -n \"$model_id\" ]; then case \"$model_id\" in *haiku*) model_short=\"haiku\";; *sonnet*) model_short=\"sonnet\";; *opus*) model_short=\"opus\";; *) model_short=$(echo \"$model_id\" | grep -oE '(haiku|sonnet|opus)' | head -n1);; esac; [ -n \"$model_short\" ] && model_info=\" [$model_short]\"; fi; total_in=$(echo \"$input\" | jq -r '.context_window.total_input_tokens // 0'); total_out=$(echo \"$input\" | jq -r '.context_window.total_output_tokens // 0'); context_size=$(echo \"$input\" | jq -r '.context_window.context_window_size // 0'); used_pct=$(echo \"$input\" | jq -r '.context_window.used_percentage // 0'); context_info=\"\"; if [ \"$context_size\" -gt 0 ]; then in_k=$((total_in / 1000)); out_k=$((total_out / 1000)); size_k=$((context_size / 1000)); context_info=$(printf \" [in:%dk out:%dk / %dk, %d%%]\" \"$in_k\" \"$out_k\" \"$size_k\" \"$used_pct\"); fi; printf \"\\033[01;32m%s@%s\\033[00m:\\033[01;34m%s\\033[00m%s\\033[35m%s\\033[00m\\033[33m%s\\033[00m\" \"$user\" \"$host\" \"$cwd\" \"$git_info\" \"$model_info\" \"$context_info\""

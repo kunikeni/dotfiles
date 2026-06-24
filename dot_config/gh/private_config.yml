@@ -14,8 +14,8 @@ pager:
 aliases:
     co: pr checkout
     b: browse
-    cl: repo clone niftycorporation/$1
-    pr-open: pr create -a @me -r niftycorporation/team-<team> -t
+    cl: repo clone {{ .github_organization }}/$1
+    pr-open: pr create -a @me -r {{ .github_organization }}/{{ .github_team }} -t
 # The path to a unix socket through which send HTTP connections. If blank, HTTP traffic will be handled by net/http.DefaultTransport.
 http_unix_socket:
 # What web browser gh should use when opening URLs. If blank, will refer to environment.
