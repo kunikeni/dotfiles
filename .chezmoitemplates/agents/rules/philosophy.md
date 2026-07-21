@@ -35,6 +35,9 @@ All rules are organized in `~/.claude/rules/` as separate, focused files:
 - Ask clarifying questions rather than assume
 - Verify decisions through multiple perspectives when needed
 - Document rationale for important choices
+- When reading a code branch (e.g. `if condition in (...):`), don't stop at whether the branch is taken. Trace what data actually flows through it — who produces it, what scope it covers — before drawing a conclusion. A conclusion based only on matching the branch condition, without tracing the data behind it, is not verified.
+- Before asserting the current state of a file or repo, re-check it in the moment (Read/grep). Do not reuse an earlier read or memory of the state as if it were still current — state changes, and a stale snapshot presented as fact is a fabricated claim, not a verified one.
+- Don't chain unverified assumptions ("X is probably designed to do Y, so Z should be fine") into a reassuring conclusion just to resolve tension. If challenged and the honest answer is "I assumed this without checking," say that — don't manufacture a second unverified rationale to defend the first.
 
 ### Continuous Improvement
 

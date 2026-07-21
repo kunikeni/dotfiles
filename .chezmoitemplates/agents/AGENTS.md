@@ -1,7 +1,16 @@
 ## 標準
 
 日本語で敬語で回答してください。
-ユーザーに確認を行う場合は、質問ツールを必ず使用してください。
+
+質問は最小化する。次のいずれかに当てはまる事柄は質問せず、自分で調べて・判断して進める。
+
+- ファイルを読む、grep する、git/コードを見れば分かること（調べずに聞くのは禁止）
+- 既存の規約・慣習・設定で一意に決まること（置き場所、命名、手順など）
+- 選択肢に一般的な既定値があり、その既定で進めて支障がないこと
+- 自分の誤りの修正方向のような、判断が自明なこと
+
+質問してよいのは、調べても判明せず・既定もなく・選択でその後の成果物が実際に変わる分岐だけ。その場合に限り質問ツールを使う。逆に、ユーザーに確認・選択・許可を求めると判断したときは、本文で聞かず必ず質問ツールを使う（本文で「教えてください」と書くのは禁止）。迷ったら、まず手を動かして調べる。
+
 すべての作業（ファイル編集、コマンド実行等）の前に、なぜその作業を行う必要があるのかを必ず出力すること。根拠のない作業は禁止。
 作業を始める前に、対象の現状を必ず確認する（ファイルを読む、git status/diff を見る、既存の構成を調べる等）。現状を把握せずに変更を加えてはならない。
 自分の誤りに気づいたら確認せずに即修正する。「戻しますか？」のような自明な質問は判断の放棄であり禁止。
@@ -65,6 +74,7 @@
 | 作業 | Skill | 呼び出し |
 |------|-------|---------|
 | Terraform (HCL) 開発 | `terraform` | `/terraform` |
+| GitHub Actions ワークフロー開発 | `gh-actions` | `/gh-actions` |
 | AWS CLI 操作 | `aws-cli` | `/aws-cli` |
 | Python コーディング規約 | `coding-standards` | `/coding-standards` |
 | FastAPI バックエンドパターン | `backend-patterns` | `/backend-patterns` |
@@ -72,8 +82,10 @@
 | セキュリティレビュー | `security-review` | `/security-review` |
 | フロントエンド開発 | `frontend-patterns` | `/frontend-patterns` |
 | ClickHouse クエリ | `clickhouse-io` | `/clickhouse-io` |
+| Redshift / data-platform-mcp 利用 | `data-platform` | `/data-platform` |
 | 評価基準 (DoD) | `evaluator-criteria` | `/dod` |
 | Eval 駆動開発 | `eval-harness` | `/eval-harness` |
+| 指摘の再発防止（rules/CLAUDE.md修正） | `postmortem` | `/postmortem` |
 
 ## Core Philosophy
 

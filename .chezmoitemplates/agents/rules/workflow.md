@@ -1,140 +1,103 @@
 # Work Process & Verification Flow
 
-## Workflow Overview
+## Overview
 
-All tasks follow a three-phase process: Plan → Implement → Verify
+Every task follows three phases: **Plan → Implement → Verify**.
 
-### Phase 1: Plan
+## Phase 1: Plan
 
-- Present work approach proposal
-- Define clear completion criteria
-- Obtain user approval before implementation starts
-- Identify dependencies and potential risks
+- Present the work approach as a proposal, not a fait accompli
+- Define clear, testable completion criteria
+- Obtain user approval before starting implementation
+- Surface dependencies, risks, and reversibility concerns
 
-### Phase 2: Implement
+## Phase 2: Implement
 
-**Tools & Environment:**
+### Follow existing patterns
 
-- Use Serena's symbolic edit tools for precise edits
-- Follow existing implementation patterns (custom implementations prohibited)
+- Read surrounding code before writing new code
+- Match the project's conventions (naming, structure, error handling, module layout)
+- Do not introduce custom patterns to work around standard project tooling
+- Verify folder structure before creating new files; add new files only when existing structure genuinely cannot host the change
 
-**Command Execution Rules (CRITICAL):**
+### Task runner is the source of truth (CRITICAL)
 
-All commands must go through `uv run`. Regardless of the task runner (taskipy, make, etc.), always execute via `uv run`.
+Every project defines a task runner (taskipy, npm/pnpm scripts, mise, make, etc.). Lint / format / test / type-check MUST be executed through it. Never invoke the underlying tool directly — options, target paths, and tool versions live in the task runner definition, and direct execution silently uses a different scope than CI.
 
-```bash
-# taskipy
-uv run task test
-uv run task lint
+| Ecosystem | Task runner call | Direct tool call (prohibited) |
+|-----------|------------------|-------------------------------|
+| Python (uv + taskipy) | `uv run task lint` / `test` / `format` / `type-check` | `uv run ruff check .`, `uv run mypy .` |
+| Node.js (pnpm) | `pnpm lint` / `pnpm test` | `pnpm exec eslint .`, `npx tsc` |
+| Node.js (npm) | `npm run lint` / `npm test` | `npx eslint .` |
+| mise | `mise run lint` / `mise run test` | direct binary invocation |
+| Makefile | `make lint` / `make test` | direct binary invocation |
+| Terraform | (no task runner) — see `terraform` skill DoD | — |
 
-# Makefile
-uv run make test
-uv run make lint
+If no task runner exists in the project, the first task is to define one; not to work around its absence with ad-hoc commands.
 
-# Other task runners follow the same pattern
-uv run <runner> <command>
-```
+### Ad-hoc single-target execution
 
-**Direct Tool Execution Prohibited (CRITICAL):**
+Running a single test file, targeting a single lint rule, or scoping a type-check to one module during iteration is allowed. This applies only while debugging — DoD verification always uses the task runner's full-project command.
 
-Never invoke linters, formatters, or type checkers directly. Always use the project-defined task runner.
+Example: `uv run pytest tests/test_user.py::test_case` while debugging is fine; DoD still requires `uv run task test` against the whole project.
 
-```bash
-# Prohibited: direct tool execution
-uv run ruff check .
-uv run ruff format .
-uv run mypy .
+## Phase 3: Verify (Completion Gate)
 
-# Correct: via task runner
-uv run task lint
-uv run task format
-uv run task type-check
-uv run task test
-```
+### Prerequisites
 
-**pytest Exception:**
+- Implementation is complete — no half-done branches, no TODO placeholders
+- Tests have been added for the change. Writing tests is not optional. Reporting "done" without tests is prohibited.
 
-`uv run pytest` is allowed during development for running individual tests (specific files or test functions). However, for DoD (Phase 3: Verify) final verification, always use the task runner (`uv run task test`).
+### DoD execution order (never skip or reorder)
 
-```bash
-# During development: allowed (individual test execution)
-uv run pytest tests/test_user.py
-uv run pytest tests/test_user.py::test_create_user_success -v
+1. Implementation is done
+2. Tests are written for the change
+3. Run every DoD command for the ecosystem
+4. On any failure, fix the root cause and restart from step 3 (no resuming mid-way)
+5. Report completion — no hedging, no extra questions
 
-# DoD verification: prohibited (must use task runner)
-uv run pytest          # NG — use uv run task test for DoD
-```
+### DoD commands per ecosystem
 
-**Reason:** Each project manages tool settings, options, and target scope through its task runner. Direct execution ignores project-specific configuration and causes inconsistent results.
+The concrete command list lives in the ecosystem's skill. Do not duplicate it here — refer out:
 
-**Code Organization:**
+| Ecosystem | Authoritative DoD source |
+|-----------|--------------------------|
+| Python | `coding-standards` skill |
+| Terraform | `terraform` skill |
+| GitHub Actions workflow | `gh-actions` skill |
+| Other | Project's task runner definitions (lint / format / test / type-check targets) |
 
-- Verify folder structure before placing new files
-- Create new files only if existing structure is incompatible
-- Place code following existing patterns and conventions
+When no skill covers the ecosystem, the DoD is: **all lint / format / test / type-check commands defined by the project's task runner, executed against the entire project.**
 
-### Phase 3: Verify (Completion Gate)
+### Scope
 
-**Precondition (CRITICAL):** Confirm all target modifications are complete before running verification. Do not run DoD mid-implementation.
+Whole project, not just changed files. Per-file or per-directory verification (e.g. `<runner> lint src/changed_file`) is not acceptable for DoD, because CI runs against the entire project and drift in unchanged files still breaks the merge.
 
-**Test Addition Obligation (CRITICAL):** When code is modified, always create test code that ensures the quality of that modification. No need to ask "should I add tests?" — if there is a modification, write tests. Tests MUST be written BEFORE running DoD. Running DoD without tests is prohibited. Reporting "done" without tests is prohibited.
+### Definition of Done
 
-**DoD Execution Order (CRITICAL — never skip or reorder):**
-
-1. Complete the implementation
-2. Write tests covering the implemented behavior
-3. Run all DoD commands
-4. If any error occurs, fix and restart from step 3
-5. Report completion (no hesitation, no extra questions)
-
-**Language-specific DoD Commands:**
-
-| Language | Commands |
-|----------|----------|
-| All (common) | lint, format, test |
-| Python | `uv run task lint` / `uv run task format` / `uv run task type-check` / `uv run task test` |
-| Terraform | `terraform fmt -recursive` / `terraform validate` / `tflint --config $(pwd)/.tflint.hcl --recursive` / `terraform plan` |
-
-**DoD Execution Rules (CRITICAL):**
-
-1. Run DoD every time a modification occurs, after all modifications are complete
-2. Execute all commands for the relevant language (partial execution is invalid)
-3. If any error occurs, fix it and re-run the entire DoD from the beginning (no resuming mid-way)
-4. Only results from the commands defined above are accepted as DoD — no other command output qualifies
-
-**Scope (CRITICAL):** Verify the entire project. Not just changed files — all code must pass with zero errors.
-
-**Definition of Done:**
-
-- [ ] Test code has been added for the modification
-- [ ] All DoD commands for the relevant language completed with zero errors
-- [ ] Verification covers the entire project, not just changed files
-- [ ] File-specific or directory-specific verification (e.g. `uv run task lint src/changed_file.py`) is not acceptable — always run against the entire project
-- [ ] If any error remains, the task is incomplete
+- [ ] Tests added for the change
+- [ ] Every DoD command passed with zero errors
+- [ ] Verification covered the entire project (not scoped to changed files)
+- [ ] No error remains — a single failure means the task is not done
 
 ## Prohibited Actions
 
-Never use:
-
-- `sed`, `cat`, `awk` commands for file operations
-- Custom scripts to simplify or bypass standard tools
-- Implementation patterns that deviate from existing codebase
-- Direct execution of linters / formatters / type checkers (`uv run ruff`, `uv run mypy`, etc.)
-- Direct `uv run pytest` execution for DoD verification (allowed during development only)
-- Command execution without `uv run` (bare `python`, `ruff`, `pytest` invocations)
+- Reading or editing files with `sed`, `cat`, `awk` — use the Read / Edit tools instead
+- Bypassing the task runner by invoking linters, formatters, or type-checkers directly
+- File-scoped or directory-scoped DoD verification (must be whole-project)
+- Custom scripts written to simplify or work around standard project tooling
+- Implementation patterns that deviate from the existing codebase without explicit justification
 
 ## Implementation Patterns
 
-### Following Conventions
+### Following conventions
 
-- Examine existing code patterns before writing new code
-- Maintain consistency with established patterns
-- Refactor consistently across similar functionality
-- Document custom patterns if unavoidable
+- Read existing code before writing new code
+- Refactor similar functionality consistently across the codebase
+- Document custom patterns only when they are genuinely unavoidable
 
-### Token Efficiency
+### Token efficiency
 
-- Plan operations to minimize unnecessary iterations
-- Batch independent operations for parallel execution
+- Batch independent operations into parallel tool calls
 - Compress context strategically between phases
 - Avoid repetitive or redundant work
