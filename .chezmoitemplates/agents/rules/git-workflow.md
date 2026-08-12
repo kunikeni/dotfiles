@@ -106,7 +106,7 @@ When creating PRs:
 1. Analyze full commit history (not just latest commit)
 2. Use `git diff [base-branch]...HEAD` to see all changes
 3. Keep PR title under 70 characters
-4. Include Summary (bullet points) and Test Plan in body
+4. Read `.github/PULL_REQUEST_TEMPLATE.md` (and any locale variants) first; follow its section structure verbatim if present. Fall back to Summary + Test Plan only when no template exists.
 5. Do not push (user handles push manually)
 
 ## Feature Implementation Workflow

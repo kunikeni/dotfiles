@@ -1,0 +1,31 @@
+# Ubuntu 固有のセットアップ定義（MISE_ENV=ubuntu で読み込まれる）
+
+[bootstrap.user]
+login_shell = "/usr/bin/zsh"
+
+# docker は Ubuntu 標準リポジトリに無いので、apt を叩く前にリポジトリを登録する
+[bootstrap.hooks.pre-packages]
+run = 'sh "$(chezmoi source-path)/bin/ubuntu/apt-repos.sh"'
+
+[bootstrap.packages]
+"apt:btop" = "latest"
+"apt:build-essential" = "latest"
+"apt:ca-certificates" = "latest"
+"apt:curl" = "latest"
+"apt:git" = "latest"
+"apt:gnupg" = "latest"
+"apt:lsb-release" = "latest"
+"apt:unzip" = "latest"
+"apt:vim" = "latest"
+"apt:zsh" = "latest"
+"apt:zsh-autosuggestions" = "latest"
+# docker
+"apt:containerd.io" = "latest"
+"apt:docker-buildx-plugin" = "latest"
+"apt:docker-ce" = "latest"
+"apt:docker-ce-cli" = "latest"
+"apt:docker-compose-plugin" = "latest"
+
+# docker を sudo なしで使えるようにする（反映には再ログインが必要）
+[bootstrap.hooks.post-packages]
+run = 'sudo usermod -aG docker "$(id -un)"'

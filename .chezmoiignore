@@ -1,8 +1,11 @@
 # --- Common ignore always ---
-packages/**
+# セットアップ用のスクリプトとマシン定義。ホームには展開しない
+bin/**
+mise.toml
+mise.mac.toml
+mise.ubuntu.toml
 README.md
 cspell.json
-chezmoi.toml.template
 
 # --- Windows ---
 {{ if eq .chezmoi.os "windows" }}

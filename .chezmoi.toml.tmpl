@@ -1,0 +1,30 @@
+{{- /* chezmoi init 時に一度だけ設定値を尋ね、~/.config/chezmoi/chezmoi.toml を作る。 */ -}}
+{{- /* 既に値があるものは尋ねない（promptStringOnce）。 */ -}}
+{{- $gitName := promptStringOnce . "gitName" "git のユーザー名" -}}
+{{- $userEmail := promptStringOnce . "userEmail" "git のメールアドレス" -}}
+{{- $ssoSessionName := promptStringOnce . "SSO_SESSION_NAME" "AWS SSO のセッション名" -}}
+{{- $githubOrganization := promptStringOnce . "github_organization" "GitHub の組織名" -}}
+{{- $githubTeam := promptStringOnce . "github_team" "GitHub のチーム名" -}}
+{{- $claudeMode := promptStringOnce . "claude_mode" "Claude Code の接続先 (team / bedrock)" "team" -}}
+{{- $claudeAwsProfile := promptStringOnce . "claude_aws_profile" "Claude Code が使う AWS プロファイル (bedrock 以外なら空でよい)" "" -}}
+{{- $claudeModel := promptStringOnce . "claude_model" "Claude Code のモデル" "claude-opus-4-7" -}}
+{{- $codexProfile := promptStringOnce . "codex_profile" "codex のプロファイル" "sandbox" -}}
+{{- $codexModel := promptStringOnce . "codex_model" "codex のモデル" "openai.gpt-5.5" -}}
+
+[template]
+    leftDelimiter = "{{ "{{{" }}"
+    rightDelimiter = "{{ "}}}" }}"
+
+[data]
+    gitName = {{ $gitName | quote }}
+    userEmail = {{ $userEmail | quote }}
+    SSO_SESSION_NAME = {{ $ssoSessionName | quote }}
+    github_organization = {{ $githubOrganization | quote }}
+    github_team = {{ $githubTeam | quote }}
+    claude_mode = {{ $claudeMode | quote }}
+    claude_aws_profile = {{ $claudeAwsProfile | quote }}
+    claude_model = {{ $claudeModel | quote }}
+    codex_profile = {{ $codexProfile | quote }}
+    codex_model = {{ $codexModel | quote }}
+    {{- /* Homebrew の PAT は対話で尋ねない。平文で残るので必要なときだけ手で設定する。 */}}
+    HOMEBREW_GITHUB_API_TOKEN = {{ index . "HOMEBREW_GITHUB_API_TOKEN" | default "" | quote }}

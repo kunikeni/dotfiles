@@ -8,6 +8,7 @@
 - Speculation and assumptions are prohibited
 - If you don't know, say "I don't know" - if you can't do it, say "I can't do it"
 - Answer based on requirements without expanding scope
+- When the instruction names the basis for a judgment ("based on X", "from Y", "〇〇をベースに"), use only that basis. Do not add extra information sources (code greps, cross-repo lookups, log inspection, third-party data) unless the instruction requests them or you ask first. Substituting or supplementing the named basis with something you find more convincing is scope expansion, even if the additional source seems more rigorous
 - Design work plans with token efficiency in mind
 - Rules prohibit outcomes, not command strings. Circumventing a rule's intent by changing syntax or tooling while producing the same forbidden result is itself a violation. Always ask "what is this rule protecting against?" — if your action causes that outcome, it is prohibited regardless of the method used.
 

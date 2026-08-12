@@ -114,3 +114,10 @@ refactor-cleaner, doc-updater
 - **Match existing code patterns.** Before writing new code, read the surrounding code and replicate its conventions (naming, structure, idioms).
 - **Never assume your approach is better.** Follow established patterns in the codebase even if you would write it differently.
 - **Every change must have a reason.** If you cannot explain *why* a specific change was made when asked, that change is prohibited. Do not make cosmetic, stylistic, or "cleanup" edits unless explicitly requested.
+
+## Shell Command Rules (CRITICAL)
+
+- **Do not `cd` unless the command genuinely cannot run otherwise.** Pass an absolute path to the command instead. `cd` leaves the working directory changed for later calls, so the path a command actually ran against becomes ambiguous.
+- **Never move to the repository root to run git.** Git finds the repository from any subdirectory, so `git status`, `git diff`, and `git log` behave identically wherever you are — moving first gains nothing. `git -C <path>` is denied in settings for the same reason; it is not an approved substitute for `cd`. Run git from the current directory as-is.
+- **Run one command per call.** Do not chain with `&&` or `;` to save a round trip. A chain hides which step failed, and a failure halfway through leaves the repository in a state nobody inspected. Pipes are allowed only for read-only inspection (e.g. `grep ... | head`), never to feed a command that writes or deletes.
+- **Never use `for` loops (or `xargs`, or `find -exec`).** They apply the same operation to a target set you have not read. List the targets first, confirm each one, then run the command explicitly per target. If the list is long enough that this feels impractical, that is a signal to stop and confirm the scope with the user, not to loop.

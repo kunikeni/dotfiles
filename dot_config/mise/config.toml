@@ -1,9 +1,23 @@
 [tools]
+# 言語とインフラ
 node = "latest"
-uv = "latest"
 terraform = "latest"
 tflint = "latest"
-"npm:ccusage" = "latest"
+uv = "latest"
+# CLI ツール
+awscli = "latest"
+bat = "latest"
+ctop = "latest"
+eza = "latest"
+fd = "latest"
+fzf = "latest"
+gh = "latest"
+jq = "latest"
+neovim = "latest"
+ripgrep = "latest"
+starship = "latest"
+yazi = "latest"
+zoxide = "latest"
 
 [settings]
 idiomatic_version_file_enable_tools = []

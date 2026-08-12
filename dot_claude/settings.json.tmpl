@@ -5,8 +5,8 @@
       "AWS_PROFILE": {{ .claude_aws_profile | quote }},
       "AWS_REGION": "us-east-1",
       "ANTHROPIC_MODEL": {{ .claude_model | quote }},
+      "ANTHROPIC_SMALL_FAST_MODEL": "us.anthropic.claude-haiku-4-5-20251001-v1:0",
     {{ end }}
-    "ANTHROPIC_SMALL_FAST_MODEL": "us.anthropic.claude-haiku-4-5-20251001-v1:0",
     "CLAUDE_CODE_MAX_OUTPUT_TOKENS": "500000",
     "MAX_THINKING_TOKENS": "10240"
   },
@@ -73,5 +73,6 @@
     "notion@claude-plugins-official": true,
     "code-review@claude-plugins-official": true
   },
-  "language": "Japanese"
+  "language": "Japanese",
+  "effortLevel": "high"
 }

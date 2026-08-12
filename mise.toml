@@ -1,0 +1,13 @@
+# OS 固有の定義は mise.mac.toml / mise.ubuntu.toml にあり、MISE_ENV で切り替える。
+# CLI ツールは dot_config/mise/config.toml に置く。この設定はリポジトリ限定なので、ここに書いた tools はグローバルな PATH に載らない。
+
+[bootstrap.mise_shell_activate]
+bashrc = "activate"
+zshrc = "activate"
+
+[tasks.sync]
+description = "chezmoi apply してからパッケージとツールの差分を反映する"
+run = [
+  "chezmoi apply",
+  "mise bootstrap --yes --skip dotfiles",
+]

@@ -5,7 +5,15 @@
     "dictionaries": [],
     "words": [
         "chezmoi",
-        "tmpl"
+        "chezmoiignore",
+        "coreutils",
+        "ghostty",
+        "nvim",
+        "tmpl",
+        "vimrc",
+        "wezterm",
+        "yazi",
+        "uutils"
     ],
     "ignoreWords": [],
     "import": []

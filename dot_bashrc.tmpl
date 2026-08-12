@@ -170,7 +170,7 @@ export HOMEBREW_GITHUB_API_TOKEN={{ .HOMEBREW_GITHUB_API_TOKEN | quote }}
 export PATH="$HOME/.local/bin:$PATH"
 export PATH="/opt/homebrew/bin:$PATH"
 ### MANAGED BY RANCHER DESKTOP START (DO NOT EDIT)
-export PATH="/Users/{{ .userName }}/.rd/bin:$PATH"
+[ -d "$HOME/.rd/bin" ] && export PATH="$HOME/.rd/bin:$PATH"
 ### MANAGED BY RANCHER DESKTOP END (DO NOT EDIT)
 
 ## alias
@@ -182,8 +182,12 @@ alias ll='eza --icons -al --group-directories-first'
 alias tree='eza --icons -al -T -L 2'
 alias vim='nvim'
 alias vibe='PORT=3000 npx vibe-kanban'
-alias ctop='DOCKER_HOST=unix:///Users/{{ .userName }}/.rd/docker.sock ctop'
-alias ctops='DOCKER_HOST=unix:///Users/{{ .userName }}/.rd/docker.sock ctop -s mem'
+if [ -S "$HOME/.rd/docker.sock" ]; then
+  alias ctop="DOCKER_HOST=unix://$HOME/.rd/docker.sock ctop"
+  alias ctops="DOCKER_HOST=unix://$HOME/.rd/docker.sock ctop -s mem"
+else
+  alias ctops='ctop -s mem'
+fi
 alias fd='fd -H | fzf --height 30% --border'
 
 ## completion
