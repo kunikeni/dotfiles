@@ -22,20 +22,10 @@
 [pull]
 	rebase = false
 
-{{ if eq .chezmoi.os "darwin" }}
-# macOSの場合
+# gh は mise 管理のため、両 OS 共通で mise shim を使う
 [credential "https://github.com"]
 	helper =
-	helper = !/opt/homebrew/bin/gh auth git-credential
+	helper = !{{ .chezmoi.homeDir }}/.local/share/mise/shims/gh auth git-credential
 [credential "https://gist.github.com"]
 	helper =
-	helper = !/opt/homebrew/bin/gh auth git-credential
-{{ else if eq .chezmoi.os "linux" }}
-# Linuxの場合
-[credential "https://github.com"]
-	helper =
-	helper = !/usr/bin/gh auth git-credential
-[credential "https://gist.github.com"]
-	helper =
-	helper = !/usr/bin/gh auth git-credential
-{{ end }}
+	helper = !{{ .chezmoi.homeDir }}/.local/share/mise/shims/gh auth git-credential
