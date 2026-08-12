@@ -86,6 +86,7 @@
 | 評価基準 (DoD) | `evaluator-criteria` | `/dod` |
 | Eval 駆動開発 | `eval-harness` | `/eval-harness` |
 | 指摘の再発防止（rules/CLAUDE.md修正） | `postmortem` | `/postmortem` |
+| GitHub リポジトリのガイドライン整備（README, CONTRIBUTING, Issue/PR テンプレート等） | `repo-docs` | `/repo-docs` |
 
 ## Core Philosophy
 
