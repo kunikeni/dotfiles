@@ -61,9 +61,9 @@ if [[ ! -t 0 ]]; then
 fi
 alias g='git'
 alias gp='git pull'
-alias ls='eza --icons'
-alias ll='eza --icons -al --group-directories-first'
-alias tree='eza --icons -al -T -L 2'
+alias ls='eza --icons=auto'
+alias ll='eza --icons=auto -al --group-directories-first'
+alias tree='eza --icons=auto -al -T -L 2'
 alias vim='nvim'
 alias vibe='PORT=3000 npx vibe-kanban'
 if [ -S "$HOME/.rd/docker.sock" ]; then

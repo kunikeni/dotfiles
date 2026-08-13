@@ -45,5 +45,7 @@
 theme = Citruszest
 cursor-color = "#ff6464"
 cursor-style = "block"
+cursor-style-blink = false
+shell-integration-features = no-cursor
 selection-foreground = "#ffffff"
 selection-background = "#0066cc"

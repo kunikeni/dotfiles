@@ -81,7 +81,7 @@ set title
 " 行番号の表示
 set number
 " ヤンクでクリップボードにコピー
-set clipboard=unnamed,autoselect
+set clipboard=unnamedplus
 " Escの2回押しでハイライト消去
 nnoremap <Esc><Esc> :nohlsearch<CR><ESC>
 " シンタックスハイライト
@@ -126,3 +126,51 @@ if has("autocmd")
     \ endif
   augroup END
 endif
+
+" 現在の行をハイライト
+set cursorline
+" スペルチェック
+set nospell
+" スクロール時の余白
+set scrolloff=10
+" 折り返し時のインデント維持
+set breakindent
+" 折り返し
+set wrap
+" サイン列を常に表示
+set signcolumn=yes
+" 更新時間
+set updatetime=300
+" タブラインを常に表示
+set showtabline=2
+" ヘルプ言語
+set helplang=ja,en
+" オートインデント
+set autoindent
+" スマートタブ
+set smarttab
+" 24bit カラー
+if has('termguicolors')
+  set termguicolors
+endif
+
+"----------------------------------------
+" キーマップ
+"----------------------------------------
+" 画面分割
+nnoremap ss :split<Return><C-w>w
+nnoremap sv :vsplit<Return><C-w>w
+" アクティブウィンドウの移動
+nnoremap sh <C-w>h
+nnoremap sk <C-w>k
+nnoremap sj <C-w>j
+nnoremap sl <C-w>l
+" Emacs風
+inoremap <C-f> <Right>
+" jjでEscする
+inoremap jj <Esc>
+" 設定ファイルを開く
+nnoremap <F1> :edit $MYVIMRC<CR>
+" マウスドラッグでvisualモードに入らないようにする
+noremap <LeftDrag> <LeftMouse>
+noremap! <LeftDrag> <LeftMouse>
