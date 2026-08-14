@@ -1,0 +1,11 @@
+return function(config)
+{{ if eq .chezmoi.os "windows" }}
+    config.default_prog = { 'wsl' } -- wsl
+    config.launch_menu = {
+        {
+            label = 'PowerShell',
+            args = { 'pwsh.exe' },
+        },
+    }
+{{ end }}
+end
