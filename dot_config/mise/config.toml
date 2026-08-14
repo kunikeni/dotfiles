@@ -17,6 +17,7 @@ jq = "latest"
 neovim = "latest"
 ripgrep = "latest"
 starship = "latest"
+usage = "latest"
 yazi = "latest"
 zoxide = "latest"
 

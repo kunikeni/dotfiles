@@ -79,6 +79,21 @@ if [ -x "$(command -v brew)" ]; then
   fpath=($(brew --prefix)/share/zsh-completions $fpath)
 fi
 
+add_mise_completion_path() {
+  local install_dir
+
+  if ! command -v mise > /dev/null 2>&1; then
+    return
+  fi
+
+  install_dir=$(mise where "$1" 2> /dev/null) || return
+  fpath=("$install_dir"/**/"$2"(N) $fpath)
+}
+
+add_mise_completion_path fd autocomplete
+add_mise_completion_path yazi completions
+unfunction add_mise_completion_path
+
 # 初期化
 autoload bashcompinit && bashcompinit
 autoload -Uz compinit
@@ -86,27 +101,57 @@ compinit
 
 if [ -f /opt/homebrew/share/zsh-autosuggestions/zsh-autosuggestions.zsh ]; then
   source /opt/homebrew/share/zsh-autosuggestions/zsh-autosuggestions.zsh
+elif [ -f /usr/share/zsh-autosuggestions/zsh-autosuggestions.zsh ]; then
+  source /usr/share/zsh-autosuggestions/zsh-autosuggestions.zsh
 fi
 
 # AWS CLI
-if [ -f /opt/homebrew/share/zsh-autosuggestions/zsh-autosuggestions.zsh ]; then
-  complete -C '/opt/homebrew/bin/aws_completer' aws
+if (( $+commands[aws] && $+commands[aws_completer] )); then
+  complete -C "$commands[aws_completer]" aws
 fi
 
+# bat
+if (( $+commands[bat] )); then
+  eval "function _bat() { $(bat --completion zsh) }"
+  compdef _bat bat
+fi
+
+# chezmoi
+on_demand_completion 'chezmoi' 'chezmoi completion zsh'
+
+# Docker CLI
+on_demand_completion 'docker' 'docker completion zsh'
+
+# GitHub CLI
+on_demand_completion 'gh' 'gh completion -s zsh'
+
+# ripgrep
+on_demand_completion 'rg' 'rg --generate complete-zsh'
+
 # mise
-eval "$(mise activate zsh)"
-eval "$(mise completion zsh)"
+if (( $+commands[mise] )); then
+  on_demand_completion 'mise' 'mise completion zsh'
+fi
+
+# Terraform
+if (( $+commands[terraform] )); then
+  complete -o nospace -C terraform terraform
+fi
 
 # uv
 on_demand_completion 'uv' 'uv generate-shell-completion zsh'
 
-# GitHub CLI
-eval "$(gh completion -s zsh)"
-
 # UI
-eval "$(starship init zsh)"
+if (( $+commands[starship] )); then
+  eval "$(starship init zsh)"
+fi
 
 if [[ $- == *i* ]]; then
-  eval "$(zoxide init zsh --cmd cd)"
+  if (( $+commands[fzf] )); then
+    source <(fzf --zsh)
+  fi
+  if (( $+commands[zoxide] )); then
+    eval "$(zoxide init zsh --cmd cd)"
+  fi
   alias grep='rg'
 fi
