@@ -26,5 +26,6 @@ fi
 
 if ! command -v chezmoi >/dev/null 2>&1; then
     echo "==> installing chezmoi"
-    brew install chezmoi
+    # brew install chezmoi
+    mise use chezmoi -g
 fi

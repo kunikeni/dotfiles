@@ -14,10 +14,14 @@ export PATH="${HOME}/.local/bin:${PATH}"
 # mise は Ubuntu 標準リポジトリに無い。更新は mise self-update で行う
 if ! command -v mise >/dev/null 2>&1; then
     echo "==> installing mise"
-    curl -fsSL https://mise.run | sh
+    sudo apt install -y extrepo
+    sudo extrepo enable mise
+    sudo apt update
+    sudo apt install -y mise
 fi
 
 if ! command -v chezmoi >/dev/null 2>&1; then
     echo "==> installing chezmoi"
-    sh -c "$(curl -fsSL https://get.chezmoi.io)" -- -b "${HOME}/.local/bin"
+    # sh -c "$(curl -fsSL https://get.chezmoi.io)" -- -b "${HOME}/.local/bin"
+    mise use chezmoi -g
 fi

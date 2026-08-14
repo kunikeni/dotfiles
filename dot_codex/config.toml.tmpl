@@ -1,11 +1,5 @@
-model_provider = "amazon-bedrock"
 model = {{ .codex_model | quote }}
-web_search = "disabled"
-
-[model_providers.amazon-bedrock]
-[model_providers.amazon-bedrock.aws]
-profile = {{ .codex_profile | quote }}
-region = "us-east-2"
+model_reasoning_effort = "medium"
 
 [features]
 multi_agent = true
