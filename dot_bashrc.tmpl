@@ -200,15 +200,15 @@ compinit
 complete -C '/opt/homebrew/bin/aws_completer' aws
 
 # mise
-eval "$(mise activate zsh)"
-eval "$(mise completion zsh)"
+eval "$(mise activate bash)"
+eval "$(mise completion bash)"
 
 # uv
-on_demand_completion 'uv' 'uv generate-shell-completion zsh'
+on_demand_completion 'uv' 'uv generate-shell-completion bash'
 
 # GitHub CLI
-eval "$(gh completion -s zsh)"
+eval "$(gh completion -s bash)"
 
 # UI
-eval "$(starship init zsh)"
-eval "$(zoxide init zsh --cmd cd)"
+eval "$(starship init bash)"
+eval "$(zoxide init bash --cmd cd)"

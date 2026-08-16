@@ -129,6 +129,7 @@ on_demand_completion 'gh' 'gh completion -s zsh'
 on_demand_completion 'rg' 'rg --generate complete-zsh'
 
 # mise
+eval "$(mise activate zsh)"
 if (( $+commands[mise] )); then
   on_demand_completion 'mise' 'mise completion zsh'
 fi
