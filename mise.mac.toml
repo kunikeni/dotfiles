@@ -10,8 +10,6 @@ login_shell = "/bin/zsh"
 "brew:coreutils" = "latest"
 "brew:git" = "latest"
 "brew:grep" = "latest"
-"brew:zsh-autosuggestions" = "latest"
-"brew:zsh-completions" = "latest"
 # cask
 "brew-cask:claude" = "latest"
 "brew-cask:claude-code@latest" = "latest"

@@ -18,7 +18,6 @@ run = 'sh "$(chezmoi source-path)/bin/ubuntu/apt-repos.sh"'
 "apt:unzip" = "latest"
 "apt:vim" = "latest"
 "apt:zsh" = "latest"
-"apt:zsh-autosuggestions" = "latest"
 # docker
 "apt:containerd.io" = "latest"
 "apt:docker-buildx-plugin" = "latest"

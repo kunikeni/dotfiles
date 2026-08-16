@@ -1,0 +1,110 @@
+shell = "zsh"
+
+[plugins.zsh-completions]
+github = "zsh-users/zsh-completions"
+dir = "src"
+apply = ["fpath"]
+
+[plugins.mise-completion-paths]
+inline = '''
+add_mise_completion_path() {
+  local install_dir
+
+  if ! command -v mise > /dev/null 2>&1; then
+    return
+  fi
+
+  install_dir=$(mise where "$1" 2> /dev/null) || return
+  fpath=("$install_dir"/**/"$2"(N) $fpath)
+}
+
+add_mise_completion_path fd autocomplete
+add_mise_completion_path yazi completions
+unfunction add_mise_completion_path
+'''
+
+# 初期化
+[plugins.compinit]
+inline = '''
+autoload bashcompinit && bashcompinit
+autoload -Uz compinit
+compinit
+'''
+
+[plugins.zsh-autosuggestions]
+github = "zsh-users/zsh-autosuggestions"
+use = ["zsh-autosuggestions.zsh"]
+
+[plugins.on-demand-completion]
+inline = '''
+on_demand_completion() {
+  local cmd_name=$1
+  local completion_command=$2
+  local function_name="_${cmd_name}"
+  local comp_cmd_name="${completion_command%% *}"
+
+  eval "function $function_name() {
+    if ! command -v "$comp_cmd_name" &> /dev/null; then
+      return
+    fi
+    unfunction '$function_name'
+    eval \"\$(eval $completion_command)\"
+    \$_comps[$cmd_name]
+  }"
+
+  compdef $function_name $cmd_name
+}
+'''
+
+# AWS CLI
+[plugins.aws-completion]
+inline = '''
+if (( $+commands[aws] && $+commands[aws_completer] )); then
+  complete -C "$commands[aws_completer]" aws
+fi
+'''
+
+# bat
+[plugins.bat-completion]
+inline = '''
+if (( $+commands[bat] )); then
+  eval "function _bat() { $(bat --completion zsh) }"
+  compdef _bat bat
+fi
+'''
+
+# chezmoi
+[plugins.chezmoi-completion]
+inline = "on_demand_completion 'chezmoi' 'chezmoi completion zsh'"
+
+# Docker CLI
+[plugins.docker-completion]
+inline = "on_demand_completion 'docker' 'docker completion zsh'"
+
+# GitHub CLI
+[plugins.gh-completion]
+inline = "on_demand_completion 'gh' 'gh completion -s zsh'"
+
+# ripgrep
+[plugins.ripgrep-completion]
+inline = "on_demand_completion 'rg' 'rg --generate complete-zsh'"
+
+# mise
+[plugins.mise-completion]
+inline = '''
+if (( $+commands[mise] )); then
+  on_demand_completion 'mise' 'mise completion zsh'
+fi
+'''
+
+# Terraform
+[plugins.terraform-completion]
+inline = '''
+if (( $+commands[terraform] )); then
+  complete -o nospace -C terraform terraform
+fi
+'''
+
+# uv
+[plugins.uv-completion]
+inline = "on_demand_completion 'uv' 'uv generate-shell-completion zsh'"
