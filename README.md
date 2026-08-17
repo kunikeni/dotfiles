@@ -3,20 +3,21 @@
 macOS と Ubuntu のマシンを、一行のコマンドで同じ状態に揃えるためのリポジトリ。
 
 chezmoi が dotfiles を展開し、mise がパッケージとツールを揃える。
-`bin/install.sh` は、その2つを動かすための前提を OS ごとに用意する役割だけを持つ。
 
-対応するのは macOS と Ubuntu 24.04。`AppData/` と `bin/windows/` は残っているが対象外。
+## 対象
+
+- macOS
+- Ubuntu 24.04
 
 ## セットアップ
 
 新しいマシンで次の一行を実行する。OS は自動で判別される。
+パイプ（`curl ... | sh`）では stdin がスクリプト本体に占有され、`chezmoi init` のプロンプトが動かない。
+必ず上のコマンド置換形式を使う。
 
 ```bash
 sh -c "$(curl -fsSL https://raw.githubusercontent.com/kunikeni/dotfiles/main/bin/install.sh)"
 ```
-
-パイプ（`curl ... | sh`）では stdin がスクリプト本体に占有され、`chezmoi init` のプロンプトが動かない。
-必ず上のコマンド置換形式を使う。
 
 実行されること。
 
@@ -27,7 +28,7 @@ sh -c "$(curl -fsSL https://raw.githubusercontent.com/kunikeni/dotfiles/main/bin
 5. `mise bootstrap` でパッケージ、ツール、ログインシェルを揃える
 
 初回は 4 で設定値を尋ねられ、`~/.config/chezmoi/chezmoi.toml` が生成される。2回目以降は尋ねない。
-5 の終盤、ログインシェルの変更でパスワードを聞かれる。ここだけ無人では通らない。
+5 の終盤、ログインシェルの変更でパスワードを聞かれる。
 
 ## リポジトリの構成
 
@@ -62,12 +63,7 @@ sh -c "$(curl -fsSL https://raw.githubusercontent.com/kunikeni/dotfiles/main/bin
 
 マシンの一部とは、そのマシンに一度あればよく、OS の他の部分と整合していることに価値があるもの。
 標準コマンドの置換、シェルとそのプラグイン、システムエディタ、ビルドツール、証明書、実行基盤、GUI アプリが該当する。
-OS が標準で持っているなら書かない。
-
 作業環境の一部とは、開発作業に伴って使い、別のマシンや CI でも同じものが欲しいもの。
-設定ファイルを持つ道具（nvim, starship, yazi）もここに入る。設定は OS ではなく dotfiles に紐づくため。
-
-例外は1つだけ。`mise` と `chezmoi` は mise より先に必要になるので、macOS は brew、Ubuntu は公式インストーラで入れる。
 
 判定したら、次のファイルに書く。
 
@@ -78,7 +74,7 @@ OS が標準で持っているなら書かない。
 | マシンの一部（Ubuntu） | `mise.ubuntu.toml` |
 
 言語やインフラのツールは `dot_config/mise/config.toml` に既定版を置く。
-プロジェクトごとの版は、各プロジェクトの `.mise.toml` が上書きする。
+プロジェクトごとの版は、各プロジェクトの `mise.toml` が上書きする。
 
 `bootstrap.packages` はエントリ単位の OS 判定を持たないため、OS 固有分はファイルを分けて `MISE_ENV` で切り替えている。
 

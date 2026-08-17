@@ -596,7 +596,8 @@ with open('huge_file.txt') as f:
 
 ## Documentation
 
-- Docstring は Google Style 必須（PEP 257 準拠）
+- Docstring は Google Style 必須（Python の場合は PEP 257 準拠）
+- モジュールレベルの docstring は記載しない（ファイル冒頭に `"""..."""` を置かない）
 - ドキュメントは日本語で記述
 - コード内に日本語禁止（docstring は例外）
 - コメントは機能的ロジックの説明のみ

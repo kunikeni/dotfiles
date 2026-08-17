@@ -15,6 +15,24 @@
 作業を始める前に、対象の現状を必ず確認する（ファイルを読む、git status/diff を見る、既存の構成を調べる等）。現状を把握せずに変更を加えてはならない。
 自分の誤りに気づいたら確認せずに即修正する。「戻しますか？」のような自明な質問は判断の放棄であり禁止。
 
+指示待ちの禁止（CRITICAL）: ユーザーの依頼を受けたら、その目的が達成されるまで自律的に進める。一区切りごとに手を止めて「次はどうしますか？」と聞くのは禁止。以下は指示待ちに該当する。
+
+- タスク全体のゴールが明確なのに、途中の一工程を終えるたびに確認を求める
+- 調べれば分かること・既定で決まることについて、判断を保留してユーザーに投げ返す
+- 実装後の検証（lint、test、type-check 等）を「やりますか？」と聞く。DoD は依頼に含まれる前提であり、聞かずに実行する
+- エラーや不整合を発見したときに「どうしますか？」と聞く。原因を調べて修正案まで持つのが先で、判断が本当に分岐する箇所だけ質問ツールで問う
+
+自律進行の停止が許されるのは、質問ツールを使う条件（調べても判明せず・既定もなく・選択でその後の成果物が実際に変わる分岐）を満たす場合のみ。それ以外は手を止めずに次の工程へ進む。
+
+勝手な判断の禁止（CRITICAL）: 自律進行の裏返しとして、判断がつかない場面で独断で進めるのも禁止。調べても答えが出ず・既定もなく・選択で成果物が変わる分岐に当たったら、必ず質問ツール（AskUserQuestion）を使ってユーザーに問う。以下は特に該当する。
+
+- 要件の解釈が複数あり、どちらを採るかで実装が変わる
+- 既存の規約・慣習で決まらず、選択で後戻りコストが発生する
+- 破壊的操作（削除、上書き、force push 等）の対象が曖昧
+- ユーザーの過去の指示と現状が矛盾しており、どちらを優先すべきか不明
+
+このとき本文で「〇〇でよいですか？」と書くのは禁止（本文質問の禁止は既述のとおり）。必ず質問ツール経由で問う。自律進行と質問ツールの使用は対立せず、両方を正しく使い分けることが求められる。
+
 ## 日本語の文体（CRITICAL）
 
 自然な日本語で書くこと。英語の直訳調は禁止。
@@ -112,6 +130,7 @@ refactor-cleaner, doc-updater
 - **Do not reformat code.** Never insert or remove line breaks, change indentation, or alter whitespace beyond what the user requested. Respect the project's formatter.
 - **Do not delete existing comments.** If a comment exists, leave it as-is unless the user explicitly asks to remove it.
 - **Match existing comment style.** When adding comments, follow the format already used in the file (language, punctuation, placement).
+- **Do not add comments that merely restate adjacent code, name the tool being used, or identify where configuration is managed.** Add a comment only when it explains a non-obvious reason or constraint.
 - **Match existing code patterns.** Before writing new code, read the surrounding code and replicate its conventions (naming, structure, idioms).
 - **Never assume your approach is better.** Follow established patterns in the codebase even if you would write it differently.
 - **Every change must have a reason.** If you cannot explain *why* a specific change was made when asked, that change is prohibited. Do not make cosmetic, stylistic, or "cleanup" edits unless explicitly requested.
