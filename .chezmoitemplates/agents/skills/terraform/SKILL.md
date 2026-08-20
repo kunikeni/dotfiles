@@ -90,6 +90,12 @@ terraform/
 - `for_each` 優先（`count` は boolean 0/1 切替のみ）
 - SG ルールは `aws_security_group_rule` で個別定義（インライン禁止）
 
+## コマンド実行
+
+`terraform -chdir=<dir> <command>` および `terraform -chdir <dir> <command>` は禁止する。対象ディレクトリへ移動してから terraform を実行する。
+
+`-chdir` はサブコマンドより前に置くグローバルオプションなので、コマンド文字列が `terraform -chdir=...` で始まり、`terraform apply` や `terraform destroy` を対象にした権限拒否設定をすり抜ける。どのディレクトリに対して実行したのかもコマンドを読むだけでは追いにくく、環境を取り違えたまま apply が通ってしまう。危険な操作を止める仕組みが働かなくなるため、記法にかかわらず使わない。
+
 ## import / moved
 
 - `terraform import` / `terraform state mv` コマンド禁止 → HCL ブロック使用
@@ -105,6 +111,7 @@ terraform/
 | `terraform taint` | `terraform apply -replace` |
 | `terraform import` コマンド | `import` ブロック |
 | `terraform state mv` コマンド | `moved` ブロック |
+| `terraform -chdir=<dir>` | 対象ディレクトリへ移動してから実行 |
 | ローカル state | S3 必須 |
 | ID ハードコード | data source / remote state |
 | `merge()` タグ結合 | `default_tags` |

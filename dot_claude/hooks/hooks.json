@@ -7,10 +7,10 @@
         "hooks": [
           {
             "type": "command",
-            "command": "#!/bin/bash\ninput=$(cat)\ncmd=$(echo \"$input\" | jq -r '.tool_input.command // \"\"')\nif echo \"$cmd\" | grep -qE '\\bgit\\s+(reset|restore|push|checkout|clean|stash|rebase|cherry-pick|revert|tag|am|apply)\\b'; then\n  echo '[Hook] BLOCKED: destructive git command detected' >&2\n  echo \"[Hook] Command: $cmd\" >&2\n  exit 2\nfi"
+            "command": "#!/bin/bash\ninput=$(cat)\ncmd=$(echo \"$input\" | jq -r '.tool_input.command // \"\"')\nif echo \"$cmd\" | grep -qE '\\bgit\\s+(reset|restore|checkout|clean|stash|rebase|cherry-pick|revert|tag|am|apply)\\b'; then\n  echo '[Hook] BLOCKED: destructive git command detected' >&2\n  echo \"[Hook] Command: $cmd\" >&2\n  exit 2\nfi\nif echo \"$cmd\" | grep -qE '\\bgit\\s+push\\b' && echo \"$cmd\" | grep -qE '(^|[[:space:]])(-f|--force|--force-with-lease)([[:space:]=]|$)'; then\n  echo '[Hook] BLOCKED: force push is prohibited' >&2\n  echo \"[Hook] Command: $cmd\" >&2\n  exit 2\nfi"
           }
         ],
-        "description": "Block destructive git commands anywhere in the command string"
+        "description": "Block destructive git commands and force push anywhere in the command string"
       },
       {
         "matcher": "tool == \"Bash\" && tool_input.command matches \"(npm run dev|pnpm( run)? dev|yarn dev|bun run dev)\"",

@@ -91,7 +91,7 @@ inline = "on_demand_completion 'rg' 'rg --generate complete-zsh'"
 
 # mise
 [plugins.mise-completion]
-inline = 'mise completion zsh'
+inline = "on_demand_completion 'mise' 'mise completion zsh'"
 
 # Terraform
 [plugins.terraform-completion]
@@ -103,4 +103,4 @@ fi
 
 # uv
 [plugins.uv-completion]
-inline = "uv generate-shell-completion zsh"
+inline = "on_demand_completion 'uv' 'uv generate-shell-completion zsh'"

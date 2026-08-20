@@ -1,2 +1,3 @@
 # Homebrewのパスを優先
 export PATH=/opt/homebrew/bin/:$PATH
+export ORCA_TELEMETRY_DISABLED=1

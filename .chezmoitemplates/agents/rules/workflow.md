@@ -4,14 +4,24 @@
 
 Every task follows three phases: **Plan → Implement → Verify**.
 
+These phases are split across the client/contractor boundary defined in `agents.md`:
+
+| Phase | Owner | What that side does |
+|-------|-------|---------------------|
+| Plan | Main session (client) | Fixes requirements and acceptance criteria and writes the work order. Design detail may be delegated to **planner**, but the requirements and the acceptance criteria stay with the client |
+| Implement | Subagent (contractor) | Implements the work order with TDD. The client does not write code or tests here |
+| Verify | **evaluator**, then the client | The evaluator runs the DoD gate and reports a verdict; the client judges the deliverable against the acceptance criteria |
+
 ## Phase 1: Plan
 
-- Present the work approach as a proposal, not a fait accompli
+- Acceptance criteria are the client's deliverable for this phase. Write them before delegating — a work order without them is incomplete (see `agents.md`)
+- When the user delegates a judgment, investigate and choose one approach with reasons. Ask the user only when investigation and existing conventions cannot resolve a branch that materially changes the deliverable
 - Define clear, testable completion criteria
-- Obtain user approval before starting implementation
 - Surface dependencies, risks, and reversibility concerns
 
 ## Phase 2: Implement
+
+This phase belongs to the contractor. The client hands over the work order and stops touching production and test code, apart from the minor-change exception in `agents.md`. Everything below binds whoever holds the work order.
 
 ### Follow existing patterns
 
@@ -42,6 +52,10 @@ Running a single test file, targeting a single lint rule, or scoping a type-chec
 Example: `uv run pytest tests/test_user.py::test_case` while debugging is fine; DoD still requires `uv run task test` against the whole project.
 
 ## Phase 3: Verify (Completion Gate)
+
+### Who runs what
+
+The contractor runs the DoD commands to finish its own work order. That run is not the gate. The gate is the **evaluator**, invoked by the client after delivery — it re-runs the DoD, reviews the diff, and returns PASS / REVISE / REDESIGN. The client does not replace that step with its own lint/test run, and does not accept a deliverable the evaluator has not passed. Once the verdict is PASS, the client matches the deliverable against the acceptance criteria written in Phase 1 and makes the final call.
 
 ### Prerequisites
 
@@ -79,10 +93,15 @@ Whole project, not just changed files. Per-file or per-directory verification (e
 - [ ] Every DoD command passed with zero errors
 - [ ] Verification covered the entire project (not scoped to changed files)
 - [ ] No error remains — a single failure means the task is not done
+- [ ] Evaluator returned PASS (for delegated work)
+- [ ] The deliverable was matched against the Phase 1 acceptance criteria
 
 ## Prohibited Actions
 
-- Reading or editing files with `sed`, `cat`, `awk` — use the Read / Edit tools instead
+- Writing production or test code in the main session for work that should be delegated
+- Delegating a work order that carries no acceptance criteria
+- Accepting a deliverable without an evaluator verdict
+- Using an unsafe or lossy file operation when the execution environment provides a safer inspection or patching mechanism
 - Bypassing the task runner by invoking linters, formatters, or type-checkers directly
 - File-scoped or directory-scoped DoD verification (must be whole-project)
 - Custom scripts written to simplify or work around standard project tooling

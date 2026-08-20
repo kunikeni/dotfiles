@@ -1,11 +1,11 @@
 ---
 name: eval-harness
-description: Claude Code セッション向けの形式的な評価フレームワーク。eval 駆動開発 (EDD) 原則を実装。
+description: エージェント実装向けの形式的な評価フレームワーク。eval 駆動開発 (EDD) 原則を実装。
 ---
 
 # Eval Harness Skill
 
-A formal evaluation framework for Claude Code sessions, implementing eval-driven development (EDD) principles.
+A formal evaluation framework for agent-driven implementation, using eval-driven development (EDD) principles.
 
 ## Philosophy
 
@@ -20,11 +20,11 @@ Eval-Driven Development treats evals as the "unit tests of AI development":
 
 ### Capability Evals
 
-Test if Claude can do something it couldn't before:
+Test whether the implemented system can do something it could not do before:
 
 ```markdown
 [CAPABILITY EVAL: feature-name]
-Task: Description of what Claude should accomplish
+Task: Description of what the system should accomplish
 Success Criteria:
   - [ ] Criterion 1
   - [ ] Criterion 2
@@ -65,7 +65,7 @@ npm run build && echo "PASS" || echo "FAIL"
 
 ### 2. Model-Based Grader
 
-Use Claude to evaluate open-ended outputs:
+Delegate open-ended output evaluation to an independent model-based evaluator available in the execution environment:
 
 ```markdown
 [MODEL GRADER PROMPT]
@@ -175,39 +175,19 @@ Status: READY FOR REVIEW
 
 ### Pre-Implementation
 
-```
-/eval define feature-name
-```
-
-Creates eval definition file at `.claude/evals/feature-name.md`
+Create the eval definition as a project artifact using the evaluation mechanism available in the execution environment.
 
 ### During Implementation
 
-```
-/eval check feature-name
-```
-
-Runs current evals and reports status
+Run the current eval definition and report its status using the available evaluation mechanism.
 
 ### Post-Implementation
 
-```
-/eval report feature-name
-```
-
-Generates full eval report
+Generate the full eval report from the same definition and recorded results.
 
 ## Eval Storage
 
-Store evals in project:
-
-```
-.claude/
-  evals/
-    feature-xyz.md      # Eval definition
-    feature-xyz.log     # Eval run history
-    baseline.json       # Regression baselines
-```
+Store eval definitions, run history, and regression baselines in the project's existing evaluation directory. If the project has no established location, use the existing artifact path specified in the work order rather than inventing a product-specific directory.
 
 ## Best Practices
 
@@ -241,7 +221,7 @@ Regression Evals:
 [Write code]
 
 ### Phase 3: Evaluate
-Run: /eval check add-authentication
+Run the `add-authentication` eval definition with the evaluation mechanism available in the execution environment.
 
 ### Phase 4: Report
 EVAL REPORT: add-authentication

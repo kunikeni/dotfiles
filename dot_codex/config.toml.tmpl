@@ -1,12 +1,54 @@
 model = {{ .codex_model | quote }}
 model_reasoning_effort = "medium"
+sandbox_mode = "workspace-write"
+approval_policy = "on-request"
+approvals_reviewer = "user"
+service_tier = "default"
+
+[sandbox_workspace_write]
+network_access = false
 
 [features]
 multi_agent = true
+memories = true
+workspace_dependencies = false
 
 [tui]
-status_line = ["model-with-reasoning", "current-dir", "project-name", "git-branch", "context-used", "used-tokens", "total-input-tokens", "total-output-tokens"]
+status_line = ["model-with-reasoning", "current-dir", "git-branch", "context-used", "used-tokens", "total-input-tokens", "total-output-tokens", "five-hour-limit", "weekly-limit"]
 status_line_use_colors = true
 
-[tui.model_availability_nux]
-"openai.gpt-5.5" = 4
+[desktop]
+dock-icon-preference = "codex-system"
+usePointerCursors = false
+appshotSoundEnabled = false
+conversationDetailMode = "STEPS_PROSE"
+git-pr-instructions = "テンプレートに従うこと"
+git-commit-instructions = "対応内容を短く簡潔に"
+enabled-reasoning-efforts = ["low", "medium", "high", "xhigh", "ultra", "max"]
+projectlessWorkspaceRoot = "{{ .chezmoi.homeDir }}/Documents/github.com/sandbox"
+localeOverride = "ja-JP"
+ambient-suggestions-enabled = false
+followUpQueueMode = "steer"
+composerEnterBehavior = "cmdAlways"
+show-context-window-usage = true
+composerPlainTextMode = true
+
+[memories]
+generate_memories = true
+use_memories = true
+
+[marketplaces.openai-bundled]
+source_type = "local"
+source = "{{ .chezmoi.homeDir }}/.codex/.tmp/bundled-marketplaces/openai-bundled"
+
+[plugins."codex-app-tools@openai-bundled"]
+enabled = true
+
+[plugins."browser@openai-bundled"]
+enabled = true
+
+[plugins."visualize@openai-bundled"]
+enabled = true
+
+[plugins."chrome@openai-bundled"]
+enabled = true

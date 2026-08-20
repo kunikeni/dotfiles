@@ -519,7 +519,7 @@ Before ANY production deployment:
 セキュリティ問題が発見された場合:
 
 1. STOP immediately
-2. Use **evaluator** agent (or `/code-review` command)
+2. Delegate an independent review to **evaluator** using the mechanism available in the execution environment
 3. Fix CRITICAL issues before continuing
 4. Rotate any exposed secrets
 5. Review entire codebase for similar issues

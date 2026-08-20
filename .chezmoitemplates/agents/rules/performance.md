@@ -1,24 +1,14 @@
 # Performance Optimization
 
-## Model Selection Strategy
+## Execution Strategy
 
-**Haiku** (90% of Sonnet capability, 3x cost savings):
+Choose the role and execution path from the work itself and from the capabilities available in the active environment:
 
-- Lightweight agents with frequent invocation
-- Pair programming and code generation
-- Worker agents in multi-agent systems
-
-**Sonnet** (Best coding model):
-
-- Main development work
-- Orchestrating multi-agent workflows
-- Complex coding tasks
-
-**Opus** (Deepest reasoning):
-
-- Complex architectural decisions
-- Maximum reasoning requirements
-- Research and analysis tasks
+- Use a narrow, low-latency path for independent, well-specified tasks with bounded inputs and outputs
+- Use a general implementation role for coding work that requires repository context, edits, and verification
+- Allocate more reasoning time to architecture, ambiguous failure analysis, security decisions, and research with competing evidence
+- Parallelize only independent work with non-overlapping ownership; keep dependent steps sequential
+- Treat latency and cost as constraints after correctness, required context, permissions, and independent evaluation are satisfied
 
 ## Context Window Management
 
@@ -35,20 +25,20 @@ Lower context sensitivity tasks:
 - Documentation updates
 - Simple bug fixes
 
-## Ultrathink + Plan Mode
+## Planning and Reasoning Depth
 
 For complex tasks requiring deep reasoning:
 
-1. Use `ultrathink` for enhanced thinking
-2. Enable **Plan Mode** for structured approach
-3. "Rev the engine" with multiple critique rounds
-4. Use split role sub-agents for diverse analysis
+1. Write a structured plan before execution
+2. Allocate additional reasoning time to decisions with high uncertainty or high reversal cost
+3. Critique the plan from correctness, security, operability, and testability perspectives
+4. Use independent specialist roles for distinct analyses when the execution environment supports them
 
 ## Build Troubleshooting
 
 If build fails:
 
-1. Use **generator** agent (or `/build-fix` command)
+1. Delegate the fix to **generator**
 2. Analyze error messages
 3. Fix incrementally
 4. Verify after each fix

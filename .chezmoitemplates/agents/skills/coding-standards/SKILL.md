@@ -92,6 +92,50 @@ max_retries = 3
 api_timeout = 30
 ```
 
+### Enum for Grouped Values (CRITICAL)
+
+ステータスや種別のように、同じグループに属する値を扱うときは定数を並べず Enum を定義する。定数の羅列はグループであることを名前の接頭辞でしか表せず、取り得る値の一覧が型に現れないため、`str` を受け取る関数が想定外の文字列を弾けない。
+
+```python
+# ✅ GOOD: One Enum for one group of values
+from enum import Enum, StrEnum
+
+class MarketStatus(StrEnum):
+    ACTIVE = 'active'
+    RESOLVED = 'resolved'
+    CLOSED = 'closed'
+
+class RetryPolicy(Enum):
+    NONE = 0
+    LINEAR = 1
+    EXPONENTIAL = 2
+
+def filter_markets(markets: list[Market], status: MarketStatus) -> list[Market]:
+    """指定したステータスの market を絞り込む。
+
+    Args:
+        markets: 絞り込み対象の market の一覧。
+        status: 抽出したいステータス。
+
+    Returns:
+        ステータスが一致した market の一覧。
+    """
+    return [m for m in markets if m.status is status]
+
+# ❌ BAD: Loose constants for values that belong to one group
+MARKET_STATUS_ACTIVE = 'active'
+MARKET_STATUS_RESOLVED = 'resolved'
+MARKET_STATUS_CLOSED = 'closed'
+
+def filter_markets(markets: list[Market], status: str) -> list[Market]:
+    return [m for m in markets if m.status == status]
+```
+
+- 値を文字列として API レスポンスや DB に渡すなら `StrEnum`、識別だけが目的なら `Enum` を使う
+- 引数や返り値、entity の属性の型注釈には `str` ではなく Enum を書く。`str` のままでは取り得る値が型で表せず、mypy が誤った値を検出できない
+- 分岐は Enum のメンバーと比較する。生の文字列リテラルと突き合わせるのは、Enum を定義した意味を失う
+- グループに属する値がひとつしかない間は定数でよい。2つ目が増えた時点で Enum に移す
+
 ## Immutability Pattern (CRITICAL)
 
 ```python
@@ -304,17 +348,17 @@ tests/unit/test_market_service.py  # test_*.py or *_test.py
 
 ```python
 # ✅ GOOD: Explain WHY, not WHAT
-# Use exponential backoff to avoid overwhelming API during outages
+# 障害中に API へ負荷を集中させないため指数バックオフを使う
 delay = min(1000 * (2 ** retry_count), 30000)
 
-# Deliberately using mutation here for performance with large lists
+# 大きなリストでの性能を優先し、あえてミュータブルな操作にしている
 items.extend(new_items)
 
 # ❌ BAD: Stating the obvious
-# Increment counter by 1
+# カウンタを1増やす
 counter += 1
 
-# Set name to user's name
+# name にユーザー名を代入する
 name = user.name
 ```
 
@@ -579,6 +623,7 @@ with open('huge_file.txt') as f:
 - [ ] No deep nesting (> 4 levels)
 - [ ] Proper error handling with try/except
 - [ ] No hardcoded values (use constants)
+- [ ] Values belonging to one group are an Enum, not a list of constants
 - [ ] No mutation (immutable patterns used)
 - [ ] Type hints on all functions
 - [ ] Pass mypy type checking
@@ -598,9 +643,24 @@ with open('huge_file.txt') as f:
 
 - Docstring は Google Style 必須（Python の場合は PEP 257 準拠）
 - モジュールレベルの docstring は記載しない（ファイル冒頭に `"""..."""` を置かない）
-- ドキュメントは日本語で記述
-- コード内に日本語禁止（docstring は例外）
-- コメントは機能的ロジックの説明のみ
+- docstring、コメント、ドキュメントはすべて日本語で記述する
+- 英語で書くのは識別子などコード本体だけで、docstring とコメントはその対象に含めない
+
+### Docstring に書くこと
+
+呼び出し側がその処理を使うために必要な情報だけを書く。概要と要約であり、スコープ内のロジックの説明書ではない。
+
+- 引数や返り値の型・意味・使い方は `Args:` / `Returns:` / `Raises:` の責務。何が入ってくるかを概要にも重ねて書くと冗長になるだけ
+- 「〜としているのは〜のため」のようなロジックの理由は書かない。コメントに書く
+- 文の途中で不用意に改行しない。一行を長くしすぎない。どちらも読みにくくなるため例外は認めない
+
+### コメントに書くこと
+
+その処理を理解する補助として、処理が何なのかと、非自明なロジックをなぜそうしたのかを簡潔に書く。
+
+- 名前・型・直下のコードを見れば分かることは書かない。なぜそうしたのかも、コードから読み取れない場合のみ書く
+- 以前どうだったか、却下した代替案など、今どうなっているか以外の情報はいらない
+- 呼んでいる関数の先のロジックは書かない。その関数を見れば分かる
 
 ```python
 def create_user(name: str, age: int) -> dict[str, str | int]:
