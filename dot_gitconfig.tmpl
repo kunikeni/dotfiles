@@ -24,10 +24,12 @@
 [ghq]
     root = ~/Documents
 
-# gh は mise 管理のため、両 OS 共通で mise shim を使う
+{{ if ne .chezmoi.os "windows" }}
+# gh は mise 管理のため、macOS・Ubuntu 共通で mise shim を使う
 [credential "https://github.com"]
 	helper =
 	helper = !{{ .chezmoi.homeDir }}/.local/share/mise/shims/gh auth git-credential
 [credential "https://gist.github.com"]
 	helper =
 	helper = !{{ .chezmoi.homeDir }}/.local/share/mise/shims/gh auth git-credential
+{{ end }}
