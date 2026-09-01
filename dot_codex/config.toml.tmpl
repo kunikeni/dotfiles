@@ -41,7 +41,15 @@ use_memories = true
 source_type = "local"
 source = "{{ .chezmoi.homeDir }}/.codex/.tmp/bundled-marketplaces/openai-bundled"
 
+[marketplaces.agent-toolbox]
+source_type = "git"
+source = "https://github.com/navy1634/plugin-agent-toolbox.git"
+ref = "main"
+
 [plugins."codex-app-tools@openai-bundled"]
+enabled = true
+
+[plugins."sites@openai-bundled"]
 enabled = true
 
 [plugins."browser@openai-bundled"]
@@ -50,5 +58,32 @@ enabled = true
 [plugins."visualize@openai-bundled"]
 enabled = true
 
-[plugins."chrome@openai-bundled"]
+[plugins."documents@openai-primary-runtime"]
+enabled = true
+
+[plugins."pdf@openai-primary-runtime"]
+enabled = true
+
+[plugins."spreadsheets@openai-primary-runtime"]
+enabled = true
+
+[plugins."presentations@openai-primary-runtime"]
+enabled = true
+
+[plugins."template-creator@openai-primary-runtime"]
+enabled = true
+
+[plugins."agent-toolbox@agent-toolbox"]
+enabled = true
+
+[plugins."planning-review-docs@agent-toolbox"]
+enabled = true
+
+[plugins."coding-workflow@agent-toolbox"]
+enabled = true
+
+[plugins."specialized@agent-toolbox"]
+enabled = true
+
+[plugins."general-tools@agent-toolbox"]
 enabled = true
