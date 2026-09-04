@@ -29,10 +29,6 @@
       "Read(.env.template)",
       "Read(~/.zshrc)"
     ],
-    "ask": [
-      "Bash(git push)",
-      "Bash(git push:*)"
-    ],
     "deny": [
       "Bash(git checkout:*)",
       "Bash(git push -f)",
@@ -67,6 +63,10 @@
       "Read(*.key)",
       "Read(*.pem)"
     ],
+    "ask": [
+      "Bash(git push)",
+      "Bash(git push:*)"
+    ],
     "defaultMode": "default"
   },
 {{ if eq .claude_mode "bedrock" }}
@@ -96,5 +96,6 @@
     }
   },
   "language": "Japanese",
-  "effortLevel": "high"
+  "effortLevel": "high",
+  "hooks": {}
 }

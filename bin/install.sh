@@ -23,6 +23,7 @@ echo "==> detected OS: ${os}"
 
 # PATH の変更を引き継ぎたいので、子プロセスではなく eval でこのシェルに読み込む
 eval "$(curl -fsSL "${raw}/bin/${os}/install.sh")"
+export PATH="$HOME/.local/share/mise/shims:$PATH"
 
 # source-path は未初期化でも終了コード 0 で既定パスを返すので .git の有無で判定する
 if [ -d "$(chezmoi source-path)/.git" ]; then
