@@ -17,17 +17,14 @@ login_shell = "/bin/zsh"
 "brew-cask:font-hack-nerd-font" = "latest"
 "brew-cask:ghostty" = "latest"
 "brew-cask:google-chrome" = "latest"
-"brew-cask:michaelvillar-timer" = "latest"
 "brew-cask:notion" = "latest"
 "brew-cask:rancher" = "latest"
 "brew-cask:raycast" = "latest"
 "brew-cask:slack" = "latest"
 "brew-cask:thebrowsercompany-dia" = "latest"
 "brew-cask:visual-studio-code" = "latest"
-"brew-cask:windows-app" = "latest"
-"brew-cask:zoom" = "latest"
 
 # mise の brew-cask バックエンドが未対応な cask は brew に直接投げる。
-# Microsoft 系は pkg installer の choices、gcloud-cli は preflight の copy を使っている
+# Microsoft 系と Zoom は pkg installer の choices、gcloud-cli は preflight の copy を使っている
 [bootstrap.hooks.post-packages]
-run = "brew install --cask gcloud-cli microsoft-auto-update microsoft-excel microsoft-powerpoint microsoft-word"
+run = "brew install --cask gcloud-cli microsoft-auto-update microsoft-excel microsoft-powerpoint microsoft-word windows-app zoom"
